@@ -1,5 +1,5 @@
-#include "Circle.hpp"
-#include "Rectangle.hpp"
+#include "Shapes/Shape.hpp"
+#include "Utility/Vec.hpp"
 
 // Using SDL, SDL_image, standard IO, math, and strings
 #include <SDL2/SDL.h>
@@ -165,7 +165,7 @@ int main(int, char *[]) {
             (double)((NOW - LAST) / (double)SDL_GetPerformanceFrequency());
 
         // Accelerate the moving objects.
-        if (RectangleVsRectangle(movingRec, staticRec)) {
+        if (collidesWith(movingRec, staticRec)) {
           movingRec.velocity = Vec(0, 0);
         } else {
           movingRec.velocity.y += 9.8 / SPEED_SCALE * deltaTime;
@@ -173,11 +173,11 @@ int main(int, char *[]) {
           movingRec.max.y += movingRec.velocity.y;
         }
 
-        if (CircleVsRectangle(movingCircle, staticRec)) {
+        if (collidesWith(movingCircle, staticRec)) {
           movingCircle.velocity = Vec(0, 0);
         } else {
           movingCircle.velocity.y += 9.8 / SPEED_SCALE * deltaTime;
-          movingCircle.c.y += movingCircle.velocity.y;
+          movingCircle.center.y += movingCircle.velocity.y;
         }
 
         // Clear screen
@@ -201,8 +201,9 @@ int main(int, char *[]) {
         // Draw Circle
         for (double i = 0; i < 2 * M_PI; i += 0.001) {
           SDL_RenderDrawPoint(
-              gRenderer, movingCircle.c.x + movingCircle.radius * std::cos(i),
-              movingCircle.c.y + movingCircle.radius * std::sin(i));
+              gRenderer,
+              movingCircle.center.x + movingCircle.radius * std::cos(i),
+              movingCircle.center.y + movingCircle.radius * std::sin(i));
         }
 
         // // Render red filled quad

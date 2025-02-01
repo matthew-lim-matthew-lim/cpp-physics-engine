@@ -1,8 +1,12 @@
+#ifndef CIRCLE_HPP
+#define CIRCLE_HPP
+
+#include "../Utility/Vec.hpp"
 #include "Rectangle.hpp"
 
 class Circle {
 public:
-  Vec c;
+  Vec center;
   float radius;
   Vec velocity;
 
@@ -10,4 +14,4 @@ public:
   Circle(Vec a, float b, Vec velocity);
 };
 
-bool CircleVsRectangle(Circle a, Rectangle b);
+#endif // CIRCLE_HPP
