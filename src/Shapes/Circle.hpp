@@ -2,7 +2,6 @@
 #define CIRCLE_HPP
 
 #include "../Utility/Vec.hpp"
-#include "Rectangle.hpp"
 
 class Circle {
 public:
