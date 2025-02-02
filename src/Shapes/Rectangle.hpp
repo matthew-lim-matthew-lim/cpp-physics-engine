@@ -8,9 +8,11 @@ public:
   Vec min;
   Vec max;
   Vec velocity;
+  float mass;
+  float elasticity;
 
   // Constructor
-  Rectangle(Vec a, Vec b, Vec c);
+  Rectangle(Vec a, Vec b, Vec c, float d, float e);
 };
 
 #endif // RECTANGLE_HPP

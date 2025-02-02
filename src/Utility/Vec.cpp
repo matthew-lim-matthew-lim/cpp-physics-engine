@@ -8,11 +8,11 @@ void Vec::display() const {
   std::cout << "(" << x << "," << y << ")" << std::endl;
 }
 
-// Add method
-Vec Vec::add(const Vec &other) const { return Vec(x + other.x, y + other.y); }
+// Overloaded operators
+Vec operator-(Vec a, Vec b) { return Vec(a.x - b.x, a.y - b.y); }
 
-// Scale method
-Vec Vec::scale(double scalar) const { return Vec(x * scalar, y * scalar); }
+Vec operator+(Vec a, Vec b) { return Vec(a.x + b.x, a.y + b.y); }
 
-// Standalone add function
-Vec add(Vec v1, Vec v2) { return v1.add(v2); }
+Vec operator*(float scalar, Vec a) { return Vec(a.x * scalar, a.y * scalar); }
+
+Vec operator*(Vec a, float scalar) { return scalar * a; }

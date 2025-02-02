@@ -10,4 +10,6 @@ using Shape = std::variant<Rectangle, Circle>;
 
 bool collidesWith(const Shape &a, const Shape &b);
 
+Vec getCollisionNormal(const Shape &a, const Shape &b);
+
 #endif // SHAPES_HPP

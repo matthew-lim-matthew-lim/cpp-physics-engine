@@ -122,6 +122,7 @@ SDL_Texture *loadTexture(std::string path) {
 }
 
 const int SPEED_SCALE = 100;
+const int INFINITE_MASS = 0;
 
 int main(int, char *[]) {
   // Start up SDL and create window
@@ -138,11 +139,12 @@ int main(int, char *[]) {
       // Event handler
       SDL_Event e;
 
-      Rectangle staticRec(Vec(100, 300), Vec(500, 400), Vec(0, 0));
+      Rectangle staticRec(Vec(100, 300), Vec(500, 400), Vec(0, 0),
+                          INFINITE_MASS, 1);
 
-      Rectangle movingRec(Vec(300, 100), Vec(400, 150), Vec(0, 0));
+      Rectangle movingRec(Vec(300, 100), Vec(400, 150), Vec(0, 0), 10, 0.6);
 
-      Circle movingCircle(Vec(200, 100), 50, Vec(0, 0));
+      Circle movingCircle(Vec(200, 100), 50, Vec(0, 0), 10, 0.9);
 
       Uint64 NOW = SDL_GetPerformanceCounter();
       Uint64 LAST = 0;

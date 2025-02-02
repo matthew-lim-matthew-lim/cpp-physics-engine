@@ -10,11 +10,15 @@ public:
   Vec(double x_val = 0, double y_val = 0);
 
   void display() const;
-  Vec add(const Vec &other) const;
-  Vec scale(double scalar) const;
 };
 
-// Function prototype
-Vec add(Vec v1, Vec v2);
+// Overloaded operators
+Vec operator-(Vec a, Vec b);
+
+Vec operator+(Vec a, Vec b);
+
+Vec operator*(float scalar, Vec a);
+
+Vec operator*(Vec a, float scalar);
 
 #endif // VEC_HPP

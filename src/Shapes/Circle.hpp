@@ -8,9 +8,11 @@ public:
   Vec center;
   float radius;
   Vec velocity;
+  float mass;
+  float elasticity;
 
   // Constructor
-  Circle(Vec a, float b, Vec velocity);
+  Circle(Vec a, float b, Vec velocity, float d, float e);
 };
 
 #endif // CIRCLE_HPP
