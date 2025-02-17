@@ -1,3 +1,5 @@
+#include "Shapes/Circle.hpp"
+#include "Shapes/Rectangle.hpp"
 #include "Shapes/Shape.hpp"
 #include "Utility/Vec.hpp"
 
@@ -5,8 +7,10 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <cmath>
+#include <memory>
 #include <stdio.h>
 #include <string>
+#include <vector>
 
 // Screen dimension constants
 const int SCREEN_WIDTH = 640;
@@ -121,8 +125,8 @@ SDL_Texture *loadTexture(std::string path) {
   return newTexture;
 }
 
-const int SPEED_SCALE = 100;
-const int INFINITE_MASS = 0;
+const int SPEED_SCALE = 100; // Higher means slower
+const float INFINITE_MASS = 0;
 
 int main(int, char *[]) {
   // Start up SDL and create window
@@ -139,16 +143,23 @@ int main(int, char *[]) {
       // Event handler
       SDL_Event e;
 
-      Rectangle staticRec(Vec(100, 300), Vec(500, 400), Vec(0, 0),
-                          INFINITE_MASS, 1);
+      std::unique_ptr<Rectangle> staticRec = std::make_unique<Rectangle>(
+          Vec(100, 300), Vec(500, 400), Vec(0, 0), INFINITE_MASS, 1);
 
-      Rectangle movingRec(Vec(300, 100), Vec(400, 150), Vec(0, 0), 10, 0.6);
+      std::unique_ptr<Rectangle> movingRec = std::make_unique<Rectangle>(
+          Vec(300, 100), Vec(400, 150), Vec(0, 0.2), 10, 0.7);
 
-      Circle movingCircle(Vec(200, 100), 50, Vec(0, 0), 10, 0.9);
+      std::unique_ptr<Circle> movingCircle =
+          std::make_unique<Circle>(Vec(200, 100), 50, Vec(0, 0), 10, 0.9);
 
       Uint64 NOW = SDL_GetPerformanceCounter();
       Uint64 LAST = 0;
       double deltaTime = 0;
+
+      std::vector<std::unique_ptr<Shape>> shapes;
+      shapes.push_back(std::move(staticRec));
+      shapes.push_back(std::move(movingRec));
+      // shapes.push_back(std::move(movingCircle));
 
       // While application is running
       while (!quit) {
@@ -166,47 +177,67 @@ int main(int, char *[]) {
         deltaTime =
             (double)((NOW - LAST) / (double)SDL_GetPerformanceFrequency());
 
-        // Accelerate the moving objects.
-        if (collidesWith(movingRec, staticRec)) {
-          movingRec.velocity = Vec(0, 0);
-        } else {
-          movingRec.velocity.y += 9.8 / SPEED_SCALE * deltaTime;
-          movingRec.min.y += movingRec.velocity.y;
-          movingRec.max.y += movingRec.velocity.y;
+        // Process collisions
+        for (std::size_t i = 0; i < shapes.size(); i++) {
+          // std::cout << i << std::endl;
+          for (std::size_t j = i + 1; j < shapes.size(); j++) {
+            if (!shapes[i]->collidesWith(*shapes[j])) {
+              if (shapes[i]->mass != INFINITE_MASS) {
+                shapes[i]->velocity.y += (9.8 / SPEED_SCALE) * deltaTime;
+              }
+
+              if (shapes[j]->mass != INFINITE_MASS) {
+                shapes[j]->velocity.y += (9.8 / SPEED_SCALE) * deltaTime;
+              }
+            }
+            shapes[j]->move();
+          }
+          shapes[i]->move();
         }
 
-        if (collidesWith(movingCircle, staticRec)) {
-          movingCircle.velocity = Vec(0, 0);
-        } else {
-          movingCircle.velocity.y += 9.8 / SPEED_SCALE * deltaTime;
-          movingCircle.center.y += movingCircle.velocity.y;
-        }
+        // std::cout << "Hello!" << std::endl;
+
+        // // Accelerate the moving objects.
+        // if (collidesWith(movingRec, staticRec)) {
+        //   movingRec.velocity = Vec(0, 0);
+        // } else {
+        //   movingRec.velocity.y += 9.8 / SPEED_SCALE * deltaTime;
+        //   movingRec.min.y += movingRec.velocity.y;
+        //   movingRec.max.y += movingRec.velocity.y;
+        // }
+
+        // if (collidesWith(movingCircle, staticRec)) {
+        //   movingCircle.velocity = Vec(0, 0);
+        // } else {
+        //   movingCircle.velocity.y += 9.8 / SPEED_SCALE * deltaTime;
+        //   movingCircle.center.y += movingCircle.velocity.y;
+        // }
 
         // Clear screen
         SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(gRenderer);
 
-        // Draw Static Rectangle
-        SDL_Rect staticRecColored = {(int)staticRec.min.x, (int)staticRec.min.y,
-                                     (int)(staticRec.max.x - staticRec.min.x),
-                                     (int)(staticRec.max.y - staticRec.min.y)};
-        SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
-        SDL_RenderDrawRect(gRenderer, &staticRecColored);
-
-        // Draw Moving Rectangle
-        SDL_Rect movingRecColored = {(int)movingRec.min.x, (int)movingRec.min.y,
-                                     (int)(movingRec.max.x - movingRec.min.x),
-                                     (int)(movingRec.max.y - movingRec.min.y)};
-        SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0x00);
-        SDL_RenderDrawRect(gRenderer, &movingRecColored);
+        for (std::size_t i = 0; i < shapes.size(); i++) {
+          // std::cout << i << std::endl;
+          if (auto circlePtr = dynamic_cast<Circle *>(shapes[i].get())) {
+            for (double i = 0; i < 2 * M_PI; i += 0.001) {
+              SDL_RenderDrawPoint(
+                  gRenderer,
+                  circlePtr->center.x + circlePtr->radius * std::cos(i),
+                  circlePtr->center.y + circlePtr->radius * std::sin(i));
+            }
+          } else if (auto rectPtr =
+                         dynamic_cast<Rectangle *>(shapes[i].get())) {
+            SDL_Rect recColored = {
+                (int)rectPtr->tlPoint.x, (int)rectPtr->tlPoint.y,
+                (int)(rectPtr->brPoint.x - rectPtr->tlPoint.x),
+                (int)(rectPtr->brPoint.y - rectPtr->tlPoint.y)};
+            SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
+            SDL_RenderDrawRect(gRenderer, &recColored);
+          }
+        }
 
         // Draw Circle
-        for (double i = 0; i < 2 * M_PI; i += 0.001) {
-          SDL_RenderDrawPoint(
-              gRenderer,
-              movingCircle.center.x + movingCircle.radius * std::cos(i),
-              movingCircle.center.y + movingCircle.radius * std::sin(i));
-        }
 
         // // Render red filled quad
         // SDL_Rect fillRect = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4,

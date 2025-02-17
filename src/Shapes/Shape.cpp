@@ -1,11 +1,13 @@
 #include "Shape.hpp"
+#include "Circle.hpp"
+#include "Rectangle.hpp"
 #include <cmath>
 #include <iostream>
 
 // Determine if Rectangle vs Rectangle collision
 bool RectangleVsRectangle(const Rectangle &r1, const Rectangle &r2) {
-  return (r1.max.x > r2.min.x && r1.min.x < r2.max.x && r1.max.y > r2.min.y &&
-          r1.min.y < r2.max.y);
+  return (r1.brPoint.x > r2.tlPoint.x && r1.tlPoint.x < r2.brPoint.x &&
+          r1.brPoint.y > r2.tlPoint.y && r1.tlPoint.y < r2.brPoint.y);
 }
 
 // Determine if Circle vs Circle collision
@@ -19,8 +21,10 @@ bool CircleVsCircle(const Circle &c1, const Circle &c2) {
 
 // Determine if Rectangle vs Circle collision
 bool RectangleVsCircle(const Rectangle &rect, const Circle &circle) {
-  float closestX = std::max(rect.min.x, std::min(circle.center.x, rect.max.x));
-  float closestY = std::max(rect.min.y, std::min(circle.center.y, rect.max.y));
+  float closestX =
+      std::max(rect.tlPoint.x, std::min(circle.center.x, rect.brPoint.x));
+  float closestY =
+      std::max(rect.tlPoint.y, std::min(circle.center.y, rect.brPoint.y));
 
   float dx = circle.center.x - closestX;
   float dy = circle.center.y - closestY;
@@ -28,47 +32,19 @@ bool RectangleVsCircle(const Rectangle &rect, const Circle &circle) {
   return (dx * dx + dy * dy) <= (circle.radius * circle.radius);
 }
 
-// Determine if Figures out which collision function to call
-bool collidesWith(const Shape &a, const Shape &b) {
-  auto visitor = [](auto &&shapeA, auto &&shapeB) -> bool {
-    using T1 = std::decay_t<decltype(shapeA)>;
-    using T2 = std::decay_t<decltype(shapeB)>;
-
-    if constexpr (std::is_same_v<T1, Rectangle> &&
-                  std::is_same_v<T2, Rectangle>) {
-      return RectangleVsRectangle(shapeA, shapeB);
-    } else if constexpr (std::is_same_v<T1, Circle> &&
-                         std::is_same_v<T2, Circle>) {
-      return CircleVsCircle(shapeA, shapeB);
-    } else if constexpr (std::is_same_v<T1, Rectangle> &&
-                         std::is_same_v<T2, Circle>) {
-      return RectangleVsCircle(shapeA, shapeB);
-    } else if constexpr (std::is_same_v<T1, Circle> &&
-                         std::is_same_v<T2, Rectangle>) {
-      return RectangleVsCircle(shapeB, shapeA);
-    } else {
-      std::cerr << "Error: collidesWith() called with unrecognised shape "
-                   "type (Shape.cpp)"
-                << std::endl;
-      return false;
-    }
-  };
-  // Use std::visit to apply the visitor lambda function to std::variant objects
-  // a and b, calling the correct collision function.
-  return std::visit(visitor, a, b);
-}
-
 // Get normal vector of Rectangle vs Rectangle collision
 Vec GetNormalRectangleVsRectangle(const Rectangle &r1, const Rectangle &r2) {
-  Vec centerA = Vec((r1.min.x + r1.max.x) / 2, (r1.min.y + r1.max.y) / 2);
-  Vec centerB = Vec((r2.min.x + r2.max.x) / 2, (r2.min.y + r2.max.y) / 2);
+  Vec centerA =
+      Vec((r1.tlPoint.x + r1.brPoint.x) / 2, (r1.tlPoint.y + r1.brPoint.y) / 2);
+  Vec centerB =
+      Vec((r2.tlPoint.x + r2.brPoint.x) / 2, (r2.tlPoint.y + r2.brPoint.y) / 2);
 
   Vec difference = centerB - centerA;
   // dx and dy are the penetration depth in the x and y axis.
-  double dx = (r1.max.x - r1.min.x) / 2 + (r2.max.x - r2.min.x) / 2 -
-              std::abs(difference.x);
-  double dy = (r1.max.y - r1.min.y) / 2 + (r2.max.y - r2.min.y) / 2 -
-              std::abs(difference.y);
+  double dx = (r1.brPoint.x - r1.tlPoint.x) / 2 +
+              (r2.brPoint.x - r2.tlPoint.x) / 2 - std::abs(difference.x);
+  double dy = (r1.brPoint.y - r1.tlPoint.y) / 2 +
+              (r2.brPoint.y - r2.tlPoint.y) / 2 - std::abs(difference.y);
 
   // The normal is determined by the axis with the smallest penetration
   if (dx < dy) {
@@ -90,11 +66,14 @@ Vec GetNormalCircleVsCircle(const Circle &c1, const Circle &c2) {
 
 // Get normal vector of Rectangle vs Circle collision
 Vec GetNormalRectangleVsCircle(const Rectangle &rect, const Circle &circle) {
-  Vec centerRect((rect.min.x + rect.max.x) / 2, (rect.min.y + rect.max.y) / 2);
+  Vec centerRect((rect.tlPoint.x + rect.brPoint.x) / 2,
+                 (rect.tlPoint.y + rect.brPoint.y) / 2);
 
   // Find closest point on rectangle to the circle center
-  double closestX = std::max(rect.min.x, std::min(circle.center.x, rect.max.x));
-  double closestY = std::max(rect.min.y, std::min(circle.center.y, rect.max.y));
+  double closestX =
+      std::max(rect.tlPoint.x, std::min(circle.center.x, rect.brPoint.x));
+  double closestY =
+      std::max(rect.tlPoint.y, std::min(circle.center.y, rect.brPoint.y));
 
   Vec normal(circle.center.x - closestX, circle.center.y - closestY);
 
@@ -103,29 +82,36 @@ Vec GetNormalRectangleVsCircle(const Rectangle &rect, const Circle &circle) {
                          : Vec(0, 0);
 }
 
-Vec getCollisionNormal(const Shape &a, const Shape &b) {
-  auto visitor = [](auto &&shapeA, auto &&shapeB) -> Vec {
-    using T1 = std::decay_t<decltype(shapeA)>;
-    using T2 = std::decay_t<decltype(shapeB)>;
+float DotProduct(Vec &a, Vec &b) { return a.x * b.x + a.y * b.y; }
 
-    if constexpr (std::is_same_v<T1, Rectangle> &&
-                  std::is_same_v<T2, Rectangle>) {
-      return GetNormalRectangleVsRectangle(shapeA, shapeB);
-    } else if constexpr (std::is_same_v<T1, Circle> &&
-                         std::is_same_v<T2, Circle>) {
-      return GetNormalCircleVsCircle(shapeA, shapeB);
-    } else if constexpr (std::is_same_v<T1, Rectangle> &&
-                         std::is_same_v<T2, Circle>) {
-      return GetNormalRectangleVsCircle(shapeA, shapeB);
-    } else if constexpr (std::is_same_v<T1, Circle> &&
-                         std::is_same_v<T2, Rectangle>) {
-      return GetNormalRectangleVsCircle(shapeB, shapeA);
-    } else {
-      std::cerr << "Error: getCollisionNormal() called with unrecognised shape "
-                   "type (Shape.cpp)"
-                << std::endl;
-      return Vec(0, 0);
-    }
-  };
-  return std::visit(visitor, a, b);
+const float INFINITE_MASS = 0;
+
+void processMovement(Shape &a, Shape &b, Vec normal) {
+  float aInverseMass = a.mass == INFINITE_MASS ? 0 : 1 / a.mass;
+  float bInverseMass = b.mass == INFINITE_MASS ? 0 : 1 / b.mass;
+
+  Vec rv = b.velocity - a.velocity;
+  float velAlongNormal = DotProduct(rv, normal);
+
+  if (velAlongNormal > 0)
+    return; // Objects are separating
+
+  float e = std::min(a.elasticity, b.elasticity);
+  float j = -(1 + e) * velAlongNormal;
+  j /= aInverseMass + bInverseMass;
+
+  std::cout << "a.velocity: " << (a.velocity).y << std::endl;
+  std::cout << "b.velocity: " << (b.velocity).y << std::endl;
+
+  const Vec impulse = j * normal;
+  a.velocity -= aInverseMass * impulse;
+  b.velocity += bInverseMass * impulse;
+
+  std::cout << "aInverseMass * impulse: " << (aInverseMass * impulse).y
+            << std::endl;
+  std::cout << "bInverseMass * impulse: " << (bInverseMass * impulse).y
+            << std::endl;
+
+  std::cout << "a.velocity: " << (a.velocity).y << std::endl;
+  std::cout << "b.velocity: " << (b.velocity).y << std::endl;
 }

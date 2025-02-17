@@ -10,6 +10,10 @@ public:
   Vec(double x_val = 0, double y_val = 0);
 
   void display() const;
+
+  Vec &operator-=(const Vec &other);
+
+  Vec &operator+=(const Vec &other);
 };
 
 // Overloaded operators

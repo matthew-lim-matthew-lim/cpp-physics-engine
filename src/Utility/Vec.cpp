@@ -8,6 +8,18 @@ void Vec::display() const {
   std::cout << "(" << x << "," << y << ")" << std::endl;
 }
 
+Vec &Vec::operator-=(const Vec &other) {
+  x -= other.x;
+  y -= other.y;
+  return *this;
+}
+
+Vec &Vec::operator+=(const Vec &other) {
+  x += other.x;
+  y += other.y;
+  return *this;
+}
+
 // Overloaded operators
 Vec operator-(Vec a, Vec b) { return Vec(a.x - b.x, a.y - b.y); }
 
