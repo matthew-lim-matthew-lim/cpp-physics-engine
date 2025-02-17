@@ -23,7 +23,8 @@ public:
   virtual bool collidesWithCircle(Circle &circle) = 0;
   virtual bool collidesWithRectangle(Rectangle &rect) = 0;
 
-  virtual void move() = 0;
+  virtual void move() = 0;           // Move by 1 unit of current velocity.
+  virtual void move(Vec &delta) = 0; // Move a specific displacement.
 };
 
 void processMovement(Shape &a, Shape &b, Vec normal);

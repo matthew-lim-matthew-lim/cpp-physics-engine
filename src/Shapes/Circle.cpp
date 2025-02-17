@@ -30,7 +30,9 @@ bool Circle::collidesWithRectangle(Rectangle &rectangle) {
   return false;
 }
 
-void Circle::move() {
-  this->center.y += this->velocity.y;
-  this->center.x += this->velocity.x;
+void Circle::move() { this->move(this->velocity); }
+
+void Circle::move(Vec &delta) {
+  this->center.y += delta.y;
+  this->center.x += delta.x;
 }

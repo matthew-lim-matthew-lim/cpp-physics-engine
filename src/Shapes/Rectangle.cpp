@@ -29,9 +29,11 @@ bool Rectangle::collidesWithRectangle(Rectangle &rectangle) {
   return false;
 }
 
-void Rectangle::move() {
-  this->tlPoint.y += this->velocity.y;
-  this->tlPoint.x += this->velocity.x;
-  this->brPoint.y += this->velocity.y;
-  this->brPoint.x += this->velocity.x;
+void Rectangle::move() { this->move(this->velocity); }
+
+void Rectangle::move(Vec &delta) {
+  this->tlPoint.y += delta.y;
+  this->tlPoint.x += delta.x;
+  this->brPoint.y += delta.y;
+  this->brPoint.x += delta.x;
 }
