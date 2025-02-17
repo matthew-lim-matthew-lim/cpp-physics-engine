@@ -93,25 +93,20 @@ void processMovement(Shape &a, Shape &b, Vec normal) {
   Vec rv = b.velocity - a.velocity;
   float velAlongNormal = DotProduct(rv, normal);
 
-  if (velAlongNormal > 0)
-    return; // Objects are separating
+  if (velAlongNormal > 0) {
+    Vec oppositeRV = a.velocity - b.velocity;
+    if (DotProduct(oppositeRV, normal) > 0) {
+      return; // Objects are separating
+    } else {
+      rv = oppositeRV;
+    }
+  }
 
   float e = std::min(a.elasticity, b.elasticity);
   float j = -(1 + e) * velAlongNormal;
   j /= aInverseMass + bInverseMass;
 
-  std::cout << "a.velocity: " << (a.velocity).y << std::endl;
-  std::cout << "b.velocity: " << (b.velocity).y << std::endl;
-
   const Vec impulse = j * normal;
   a.velocity -= aInverseMass * impulse;
   b.velocity += bInverseMass * impulse;
-
-  std::cout << "aInverseMass * impulse: " << (aInverseMass * impulse).y
-            << std::endl;
-  std::cout << "bInverseMass * impulse: " << (bInverseMass * impulse).y
-            << std::endl;
-
-  std::cout << "a.velocity: " << (a.velocity).y << std::endl;
-  std::cout << "b.velocity: " << (b.velocity).y << std::endl;
 }

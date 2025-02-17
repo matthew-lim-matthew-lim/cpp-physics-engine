@@ -49,9 +49,9 @@ bool init() {
     }
 
     // Create window
-    gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED,
-                               SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
-                               SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    gWindow = SDL_CreateWindow("Awesome Physics Engine",
+                               SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                               SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
     if (gWindow == NULL) {
       printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
@@ -144,13 +144,13 @@ int main(int, char *[]) {
       SDL_Event e;
 
       std::unique_ptr<Rectangle> staticRec = std::make_unique<Rectangle>(
-          Vec(100, 300), Vec(500, 400), Vec(0, 0), INFINITE_MASS, 1);
+          Vec(50, 400), Vec(550, 450), Vec(0, 0), INFINITE_MASS, 1);
 
       std::unique_ptr<Rectangle> movingRec = std::make_unique<Rectangle>(
-          Vec(300, 100), Vec(400, 150), Vec(0, 0.2), 10, 0.7);
+          Vec(300, 100), Vec(400, 150), Vec(0, 0), 10, 0.7);
 
       std::unique_ptr<Circle> movingCircle =
-          std::make_unique<Circle>(Vec(200, 100), 50, Vec(0, 0), 10, 0.9);
+          std::make_unique<Circle>(Vec(200, 100), 20, Vec(0, 0), 10, 0.9);
 
       Uint64 NOW = SDL_GetPerformanceCounter();
       Uint64 LAST = 0;
@@ -159,7 +159,7 @@ int main(int, char *[]) {
       std::vector<std::unique_ptr<Shape>> shapes;
       shapes.push_back(std::move(staticRec));
       shapes.push_back(std::move(movingRec));
-      // shapes.push_back(std::move(movingCircle));
+      shapes.push_back(std::move(movingCircle));
 
       // While application is running
       while (!quit) {
@@ -179,7 +179,6 @@ int main(int, char *[]) {
 
         // Process collisions
         for (std::size_t i = 0; i < shapes.size(); i++) {
-          // std::cout << i << std::endl;
           for (std::size_t j = i + 1; j < shapes.size(); j++) {
             if (!shapes[i]->collidesWith(*shapes[j])) {
               if (shapes[i]->mass != INFINITE_MASS) {
@@ -194,24 +193,6 @@ int main(int, char *[]) {
           }
           shapes[i]->move();
         }
-
-        // std::cout << "Hello!" << std::endl;
-
-        // // Accelerate the moving objects.
-        // if (collidesWith(movingRec, staticRec)) {
-        //   movingRec.velocity = Vec(0, 0);
-        // } else {
-        //   movingRec.velocity.y += 9.8 / SPEED_SCALE * deltaTime;
-        //   movingRec.min.y += movingRec.velocity.y;
-        //   movingRec.max.y += movingRec.velocity.y;
-        // }
-
-        // if (collidesWith(movingCircle, staticRec)) {
-        //   movingCircle.velocity = Vec(0, 0);
-        // } else {
-        //   movingCircle.velocity.y += 9.8 / SPEED_SCALE * deltaTime;
-        //   movingCircle.center.y += movingCircle.velocity.y;
-        // }
 
         // Clear screen
         SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -232,48 +213,10 @@ int main(int, char *[]) {
                 (int)rectPtr->tlPoint.x, (int)rectPtr->tlPoint.y,
                 (int)(rectPtr->brPoint.x - rectPtr->tlPoint.x),
                 (int)(rectPtr->brPoint.y - rectPtr->tlPoint.y)};
-            SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
+            SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
             SDL_RenderDrawRect(gRenderer, &recColored);
           }
         }
-
-        // Draw Circle
-
-        // // Render red filled quad
-        // SDL_Rect fillRect = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4,
-        //                      SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
-
-        // SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
-        // SDL_RenderFillRect(gRenderer, &fillRect);
-
-        // // Render green outlined quad
-        // SDL_Rect outlineRect = {SCREEN_WIDTH / 6, SCREEN_HEIGHT / 6,
-        //                         SCREEN_WIDTH * 2 / 3, SCREEN_HEIGHT * 2 / 3};
-
-        // SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
-        // SDL_RenderDrawRect(gRenderer, &outlineRect);
-
-        // // Draw blue horizontal line
-        // SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF);
-        // SDL_RenderDrawLine(gRenderer, 0, SCREEN_HEIGHT / 2, SCREEN_WIDTH,
-        //                    SCREEN_HEIGHT / 2);
-
-        // // Draw vertical line of yellow dots
-        // SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0x00, 0xFF);
-        // for (int i = 0; i < SCREEN_HEIGHT; i += 4) {
-        //   SDL_RenderDrawPoint(gRenderer, SCREEN_WIDTH / 2, i);
-        // }
-
-        // // Pink Circle
-        // SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x69, 0xB4, 0xFF);
-        // // y = r sin(theta)
-        // // x = y cos(theta)
-        // int radius = std::min(SCREEN_HEIGHT, SCREEN_WIDTH) / 2;
-        // for (double i = 0; i < 2 * M_PI; i += 0.001) {
-        //   SDL_RenderDrawPoint(gRenderer,
-        //                       SCREEN_WIDTH / 2 + radius * std::cos(i),
-        //                       SCREEN_HEIGHT / 2 + radius * std::sin(i));
-        // }
 
         // Update screen
         SDL_RenderPresent(gRenderer);
