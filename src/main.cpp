@@ -2,13 +2,16 @@
 #include "Shapes/Rectangle.hpp"
 #include "Shapes/Shape.hpp"
 #include "Ui/Slider.hpp"
+#include "Utility/LTexture.hpp"
 #include "Utility/Vec.hpp"
 
 // Using SDL, SDL_image, standard IO, math, and strings
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <cmath>
+#include <cstddef>
 #include <memory>
 #include <stdio.h>
 #include <string>
@@ -35,6 +38,12 @@ SDL_Window *gWindow = NULL;
 
 // The window renderer
 SDL_Renderer *gRenderer = NULL;
+
+// Globally used font
+TTF_Font *gFont = NULL;
+
+// Rendered texture
+std::vector<std::unique_ptr<LTexture>> gTextTextures;
 
 bool init() {
   // Initialization flag
@@ -76,6 +85,13 @@ bool init() {
                  IMG_GetError());
           success = false;
         }
+
+        // Initialize SDL_ttf
+        if (TTF_Init() == -1) {
+          printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n",
+                 TTF_GetError());
+          success = false;
+        }
       }
     }
   }
@@ -87,11 +103,47 @@ bool loadMedia() {
   // Loading success flag
   bool success = true;
 
-  // Nothing to load
+  // Open the font
+  gFont = TTF_OpenFont("fontCenturyGothic.ttf", 28);
+  if (gFont == NULL) {
+    printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
+    success = false;
+  } else {
+    // Render text
+    SDL_Color textColor = {0, 0, 0};
+    gTextTextures.push_back(std::make_unique<LTexture>(LTexture()));
+    if (!gTextTextures.back()->loadFromRenderedText("Speed", textColor,
+                                                    gRenderer, gFont)) {
+      printf("Failed to render text texture!\n");
+      success = false;
+    }
+    gTextTextures.push_back(std::make_unique<LTexture>(LTexture()));
+    if (!gTextTextures.back()->loadFromRenderedText("Direction", textColor,
+                                                    gRenderer, gFont)) {
+      printf("Failed to render text texture!\n");
+      success = false;
+    }
+    gTextTextures.push_back(std::make_unique<LTexture>(LTexture()));
+    if (!gTextTextures.back()->loadFromRenderedText("Size", textColor,
+                                                    gRenderer, gFont)) {
+      printf("Failed to render text texture!\n");
+      success = false;
+    }
+  }
+
   return success;
 }
 
 void close() {
+  // Free loaded images
+  for (size_t i = 0; i < gTextTextures.size(); i++) {
+    gTextTextures[i]->free();
+  }
+
+  // Free global font
+  TTF_CloseFont(gFont);
+  gFont = NULL;
+
   // Destroy window
   SDL_DestroyRenderer(gRenderer);
   SDL_DestroyWindow(gWindow);
@@ -264,6 +316,11 @@ int main(int, char *[]) {
         sliderSpeed.draw();
         sliderDirection.draw();
         sliderSize.draw();
+
+        // Render current frame
+        gTextTextures[0]->render(800, 150, gRenderer);
+        gTextTextures[1]->render(800, 250, gRenderer);
+        gTextTextures[2]->render(800, 350, gRenderer);
 
         // Update screen
         SDL_RenderPresent(gRenderer);

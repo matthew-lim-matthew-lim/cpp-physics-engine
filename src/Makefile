@@ -7,10 +7,10 @@ CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++20
 
 # Libraries
-LDFLAGS = -lSDL2 -lSDL2_image
+LDFLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf
 
 # Source files
-SRC = main.cpp Ui/Slider.cpp Utility/Vec.cpp  Shapes/Shape.cpp Shapes/Rectangle.cpp Shapes/Circle.cpp 
+SRC = main.cpp Ui/Slider.cpp Utility/Vec.cpp Utility/LTexture.cpp Shapes/Shape.cpp Shapes/Rectangle.cpp Shapes/Circle.cpp 
 
 # Put all the obj files in an `obj` directory so the codebase isn't filled with them
 ODIR = obj
