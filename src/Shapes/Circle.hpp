@@ -18,7 +18,7 @@ public:
   bool collidesWithRectangle(Rectangle &rect) override;
 
   void move() override;
-  void move(Vec &delta) override;
+  void move(Vec delta) override;
 };
 
 #endif // CIRCLE_HPP

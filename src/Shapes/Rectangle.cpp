@@ -13,8 +13,13 @@ bool Rectangle::collidesWith(Shape &other) {
 
 bool Rectangle::collidesWithCircle(Circle &circle) {
   if (RectangleVsCircle(*this, circle)) {
+
     Vec normal = GetNormalRectangleVsCircle(*this, circle);
     processMovement(*this, circle, normal);
+
+    normal = GetNormalRectangleVsCircle(*this, circle);
+    float penetrationDepth = PenetrationDepthRectCircle(*this, circle);
+    positionalCorrection(*this, circle, normal, penetrationDepth);
     return true;
   }
   return false;
@@ -22,8 +27,14 @@ bool Rectangle::collidesWithCircle(Circle &circle) {
 
 bool Rectangle::collidesWithRectangle(Rectangle &rectangle) {
   if (RectangleVsRectangle(*this, rectangle)) {
+
     Vec normal = GetNormalRectangleVsRectangle(*this, rectangle);
     processMovement(*this, rectangle, normal);
+
+    normal = GetNormalRectangleVsRectangle(*this, rectangle);
+    float penetrationDepth = PenetrationDepthRectRect(*this, rectangle);
+    positionalCorrection(*this, rectangle, normal, penetrationDepth);
+
     return true;
   }
   return false;
@@ -31,7 +42,7 @@ bool Rectangle::collidesWithRectangle(Rectangle &rectangle) {
 
 void Rectangle::move() { this->move(this->velocity); }
 
-void Rectangle::move(Vec &delta) {
+void Rectangle::move(Vec delta) {
   this->tlPoint.y += delta.y;
   this->tlPoint.x += delta.x;
   this->brPoint.y += delta.y;

@@ -86,6 +86,67 @@ float DotProduct(Vec &a, Vec &b) { return a.x * b.x + a.y * b.y; }
 
 const float INFINITE_MASS = 0;
 
+float PenetrationDepthRectRect(const Rectangle &r1, const Rectangle &r2) {
+  Vec centerA = (r1.tlPoint + r1.brPoint) * 0.5f;
+  Vec centerB = (r2.tlPoint + r2.brPoint) * 0.5f;
+
+  float halfWidthA = (r1.brPoint.x - r1.tlPoint.x) * 0.5f;
+  float halfHeightA = (r1.brPoint.y - r1.tlPoint.y) * 0.5f;
+  float halfWidthB = (r2.brPoint.x - r2.tlPoint.x) * 0.5f;
+  float halfHeightB = (r2.brPoint.y - r2.tlPoint.y) * 0.5f;
+
+  float diffX = std::abs(centerA.x - centerB.x);
+  float diffY = std::abs(centerA.y - centerB.y);
+
+  // Determine the overlap along each axis
+  float overlapX = (halfWidthA + halfWidthB) - diffX;
+  float overlapY = (halfHeightA + halfHeightB) - diffY;
+
+  if (overlapX < 0 || overlapY < 0)
+    return 0.0f;
+
+  return std::min(overlapX, overlapY);
+}
+
+float PenetrationDepthCircleCircle(const Circle &c1, const Circle &c2) {
+  float dx = c1.center.x - c2.center.x;
+  float dy = c1.center.y - c2.center.y;
+  float distance = std::sqrt(dx * dx + dy * dy);
+
+  float penetration = (c1.radius + c2.radius) - distance;
+  return (penetration > 0) ? penetration : 0.0f;
+}
+
+float PenetrationDepthRectCircle(const Rectangle &rect, const Circle &circle) {
+  // Clamp circle center to rectangle boundaries.
+  float closestX =
+      std::max(rect.tlPoint.x, std::min(circle.center.x, rect.brPoint.x));
+  float closestY =
+      std::max(rect.tlPoint.y, std::min(circle.center.y, rect.brPoint.y));
+
+  float dx = circle.center.x - closestX;
+  float dy = circle.center.y - closestY;
+  float distance = std::sqrt(dx * dx + dy * dy);
+
+  if (distance > 0.0f) {
+    // Circle center is outside (or exactly on) the rectangle.
+    float penetration = circle.radius - distance;
+    return (penetration > 0.0f) ? penetration : 0.0f;
+  } else {
+    // Circle's center is inside the rectangle.
+    float left = circle.center.x - rect.tlPoint.x;
+    float right = rect.brPoint.x - circle.center.x;
+    float top = circle.center.y - rect.tlPoint.y;
+    float bottom = rect.brPoint.y - circle.center.y;
+    float minEdgeDistance = std::min({left, right, top, bottom});
+
+    // In this case, the penetration depth is the distance needed to push the
+    // circle's edge flush with the rectangle's edge. Ie. the circle's radius
+    // plus the minimum distance from the center to an edge.
+    return circle.radius + minEdgeDistance;
+  }
+}
+
 void processMovement(Shape &a, Shape &b, Vec normal) {
   float aInverseMass = a.mass == INFINITE_MASS ? 0 : 1 / a.mass;
   float bInverseMass = b.mass == INFINITE_MASS ? 0 : 1 / b.mass;
@@ -109,4 +170,17 @@ void processMovement(Shape &a, Shape &b, Vec normal) {
   const Vec impulse = j * normal;
   a.velocity -= aInverseMass * impulse;
   b.velocity += bInverseMass * impulse;
+}
+
+void positionalCorrection(Shape &a, Shape &b, Vec normal,
+                          float penetrationDepth) {
+  float aInverseMass = a.mass == INFINITE_MASS ? 0 : 1 / a.mass;
+  float bInverseMass = b.mass == INFINITE_MASS ? 0 : 1 / b.mass;
+
+  const float percent = 0.5; // usually 20% to 80%
+  const float slop = 0.01;   // usually 0.01 to 0.1
+  Vec correction = std::max(penetrationDepth - slop, 0.0f) /
+                   (aInverseMass + bInverseMass) * percent * normal;
+  a.move(-aInverseMass * correction);
+  b.move(bInverseMass * correction);
 }

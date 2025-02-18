@@ -147,10 +147,10 @@ int main(int, char *[]) {
           Vec(50, 400), Vec(550, 450), Vec(0, 0), INFINITE_MASS, 1);
 
       std::unique_ptr<Rectangle> movingRec = std::make_unique<Rectangle>(
-          Vec(300, 100), Vec(400, 150), Vec(0, 0), 10, 0.7);
+          Vec(300, 100), Vec(400, 150), Vec(0, 0), 50, 0.7);
 
       std::unique_ptr<Circle> movingCircle =
-          std::make_unique<Circle>(Vec(200, 100), 20, Vec(0, 0), 10, 0.9);
+          std::make_unique<Circle>(Vec(200, 100), 60, Vec(0, 0), 10, 0.8);
 
       Uint64 NOW = SDL_GetPerformanceCounter();
       Uint64 LAST = 0;
@@ -180,16 +180,15 @@ int main(int, char *[]) {
         // Process collisions
         for (std::size_t i = 0; i < shapes.size(); i++) {
           for (std::size_t j = i + 1; j < shapes.size(); j++) {
-            if (!shapes[i]->collidesWith(*shapes[j])) {
-              if (shapes[i]->mass != INFINITE_MASS) {
-                shapes[i]->velocity.y += (9.8 / SPEED_SCALE) * deltaTime;
-              }
-
-              if (shapes[j]->mass != INFINITE_MASS) {
-                shapes[j]->velocity.y += (9.8 / SPEED_SCALE) * deltaTime;
-              }
+            if (shapes[i]->mass != INFINITE_MASS) {
+              shapes[i]->velocity.y += (9.8 / SPEED_SCALE) * deltaTime;
             }
-            shapes[j]->move();
+
+            if (shapes[j]->mass != INFINITE_MASS) {
+              shapes[j]->velocity.y += (9.8 / SPEED_SCALE) * deltaTime;
+            }
+
+            shapes[i]->collidesWith(*shapes[j]);
           }
           shapes[i]->move();
         }
