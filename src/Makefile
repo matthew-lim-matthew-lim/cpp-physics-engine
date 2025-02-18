@@ -10,7 +10,7 @@ CXXFLAGS = -Wall -Wextra -std=c++20
 LDFLAGS = -lSDL2 -lSDL2_image
 
 # Source files
-SRC = main.cpp Utility/Vec.cpp Shapes/Shape.cpp Shapes/Rectangle.cpp Shapes/Circle.cpp
+SRC = main.cpp Ui/Slider.cpp Utility/Vec.cpp  Shapes/Shape.cpp Shapes/Rectangle.cpp Shapes/Circle.cpp 
 
 # Put all the obj files in an `obj` directory so the codebase isn't filled with them
 ODIR = obj

@@ -1,10 +1,12 @@
 #include "Shapes/Circle.hpp"
 #include "Shapes/Rectangle.hpp"
 #include "Shapes/Shape.hpp"
+#include "Ui/Slider.hpp"
 #include "Utility/Vec.hpp"
 
 // Using SDL, SDL_image, standard IO, math, and strings
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_events.h>
 #include <SDL2/SDL_image.h>
 #include <cmath>
 #include <memory>
@@ -13,8 +15,8 @@
 #include <vector>
 
 // Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1280;
+const int SCREEN_HEIGHT = 720;
 
 // Starts up SDL and creates window
 bool init();
@@ -161,6 +163,8 @@ int main(int, char *[]) {
       shapes.push_back(std::move(movingRec));
       shapes.push_back(std::move(movingCircle));
 
+      Slider slider = Slider(gRenderer, {800, 200, 400, 10});
+
       // While application is running
       while (!quit) {
         // Handle events on queue
@@ -168,6 +172,28 @@ int main(int, char *[]) {
           // User requests quit
           if (e.type == SDL_QUIT) {
             quit = true;
+          } else if (e.type == SDL_MOUSEBUTTONDOWN) {
+            if (e.button.button == SDL_BUTTON_LEFT) {
+              // Check if mouse is inside the knob rectangle
+              SDL_Point mousePoint = {e.button.x, e.button.y};
+              if (SDL_PointInRect(&mousePoint, &slider.knob)) {
+                slider.dragging = true;
+              } else {
+                std::unique_ptr<Circle> userCircle =
+                    std::make_unique<Circle>(Vec(e.button.x, e.button.y), 60,
+                                             Vec(0, slider.value), 10, 0.8);
+
+                shapes.push_back(std::move(userCircle));
+              }
+            }
+          } else if (e.type == SDL_MOUSEBUTTONUP) {
+            if (e.button.button == SDL_BUTTON_LEFT) {
+              slider.dragging = false;
+            }
+          } else if (e.type == SDL_MOUSEMOTION) {
+            if (slider.dragging) {
+              slider.updateSlider(slider, e.motion.x);
+            }
           }
         }
 
@@ -198,7 +224,6 @@ int main(int, char *[]) {
         SDL_RenderClear(gRenderer);
 
         for (std::size_t i = 0; i < shapes.size(); i++) {
-          // std::cout << i << std::endl;
           if (auto circlePtr = dynamic_cast<Circle *>(shapes[i].get())) {
             for (double i = 0; i < 2 * M_PI; i += 0.001) {
               SDL_RenderDrawPoint(
@@ -216,6 +241,8 @@ int main(int, char *[]) {
             SDL_RenderDrawRect(gRenderer, &recColored);
           }
         }
+
+        slider.draw();
 
         // Update screen
         SDL_RenderPresent(gRenderer);

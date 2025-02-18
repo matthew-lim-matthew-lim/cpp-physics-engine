@@ -43,4 +43,4 @@ float PenetrationDepthRectCircle(const Rectangle &rect, const Circle &circle);
 void positionalCorrection(Shape &a, Shape &b, Vec normal,
                           float penetrationDepth);
 
-#endif // SHAPES_HPP
+#endif // SHAPE_HPP
