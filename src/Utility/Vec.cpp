@@ -20,6 +20,8 @@ Vec &Vec::operator+=(const Vec &other) {
   return *this;
 }
 
+Vec Vec::operator-() const { return Vec(-x, -y); }
+
 // Overloaded operators
 Vec operator-(Vec a, Vec b) { return Vec(a.x - b.x, a.y - b.y); }
 

@@ -177,10 +177,10 @@ void positionalCorrection(Shape &a, Shape &b, Vec normal,
   float aInverseMass = a.mass == INFINITE_MASS ? 0 : 1 / a.mass;
   float bInverseMass = b.mass == INFINITE_MASS ? 0 : 1 / b.mass;
 
-  const float percent = 0.5; // usually 20% to 80%
+  const float percent = 0.8; // usually 20% to 80%
   const float slop = 0.01;   // usually 0.01 to 0.1
   Vec correction = std::max(penetrationDepth - slop, 0.0f) /
                    (aInverseMass + bInverseMass) * percent * normal;
-  a.move(-aInverseMass * correction);
-  b.move(bInverseMass * correction);
+  a.move(-aInverseMass * correction * 3);
+  b.move(bInverseMass * correction * 3);
 }

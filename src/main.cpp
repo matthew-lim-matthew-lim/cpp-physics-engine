@@ -146,7 +146,7 @@ int main(int, char *[]) {
       SDL_Event e;
 
       std::unique_ptr<Rectangle> staticRec = std::make_unique<Rectangle>(
-          Vec(50, 400), Vec(550, 450), Vec(0, 0), INFINITE_MASS, 1);
+          Vec(50, 550), Vec(550, 600), Vec(0, 0), INFINITE_MASS, 1);
 
       std::unique_ptr<Rectangle> movingRec = std::make_unique<Rectangle>(
           Vec(300, 100), Vec(400, 150), Vec(0, 0), 50, 0.7);
@@ -163,7 +163,9 @@ int main(int, char *[]) {
       shapes.push_back(std::move(movingRec));
       shapes.push_back(std::move(movingCircle));
 
-      Slider slider = Slider(gRenderer, {800, 200, 400, 10});
+      Slider sliderSpeed = Slider(gRenderer, {800, 200, 400, 10});
+      Slider sliderDirection = Slider(gRenderer, {800, 300, 400, 10});
+      Slider sliderSize = Slider(gRenderer, {800, 400, 400, 10});
 
       // While application is running
       while (!quit) {
@@ -176,23 +178,40 @@ int main(int, char *[]) {
             if (e.button.button == SDL_BUTTON_LEFT) {
               // Check if mouse is inside the knob rectangle
               SDL_Point mousePoint = {e.button.x, e.button.y};
-              if (SDL_PointInRect(&mousePoint, &slider.knob)) {
-                slider.dragging = true;
+              if (SDL_PointInRect(&mousePoint, &sliderSpeed.knob)) {
+                sliderSpeed.dragging = true;
+              } else if (SDL_PointInRect(&mousePoint, &sliderDirection.knob)) {
+                sliderDirection.dragging = true;
+              } else if (SDL_PointInRect(&mousePoint, &sliderSize.knob)) {
+                sliderSize.dragging = true;
               } else {
-                std::unique_ptr<Circle> userCircle =
-                    std::make_unique<Circle>(Vec(e.button.x, e.button.y), 60,
-                                             Vec(0, slider.value), 10, 0.8);
+                std::unique_ptr<Circle> userCircle = std::make_unique<Circle>(
+                    Vec(e.button.x, e.button.y),
+                    100 * std::max(sliderSize.value, static_cast<float>(0.1)),
+                    Vec(sliderSpeed.value *
+                            std::cos(M_PI * sliderDirection.value),
+                        sliderSpeed.value) *
+                        std::sin(M_PI * sliderDirection.value),
+                    10, 0.8);
 
                 shapes.push_back(std::move(userCircle));
               }
             }
           } else if (e.type == SDL_MOUSEBUTTONUP) {
             if (e.button.button == SDL_BUTTON_LEFT) {
-              slider.dragging = false;
+              sliderSpeed.dragging = false;
+              sliderDirection.dragging = false;
+              sliderSize.dragging = false;
             }
           } else if (e.type == SDL_MOUSEMOTION) {
-            if (slider.dragging) {
-              slider.updateSlider(slider, e.motion.x);
+            if (sliderSpeed.dragging) {
+              sliderSpeed.updateSlider(sliderSpeed, e.motion.x);
+            }
+            if (sliderDirection.dragging) {
+              sliderDirection.updateSlider(sliderDirection, e.motion.x);
+            }
+            if (sliderSize.dragging) {
+              sliderSize.updateSlider(sliderSize, e.motion.x);
             }
           }
         }
@@ -242,7 +261,9 @@ int main(int, char *[]) {
           }
         }
 
-        slider.draw();
+        sliderSpeed.draw();
+        sliderDirection.draw();
+        sliderSize.draw();
 
         // Update screen
         SDL_RenderPresent(gRenderer);

@@ -14,6 +14,8 @@ public:
   Vec &operator-=(const Vec &other);
 
   Vec &operator+=(const Vec &other);
+
+  Vec operator-() const;
 };
 
 // Overloaded operators
