@@ -129,6 +129,12 @@ bool loadMedia() {
       printf("Failed to render text texture!\n");
       success = false;
     }
+    gTextTextures.push_back(std::make_unique<LTexture>(LTexture()));
+    if (!gTextTextures.back()->loadFromRenderedText("Mass", textColor,
+                                                    gRenderer, gFont)) {
+      printf("Failed to render text texture!\n");
+      success = false;
+    }
   }
 
   return success;
@@ -218,6 +224,7 @@ int main(int, char *[]) {
       Slider sliderSpeed = Slider(gRenderer, {800, 200, 400, 10});
       Slider sliderDirection = Slider(gRenderer, {800, 300, 400, 10});
       Slider sliderSize = Slider(gRenderer, {800, 400, 400, 10});
+      Slider sliderWeight = Slider(gRenderer, {800, 500, 400, 10});
 
       // While application is running
       while (!quit) {
@@ -236,6 +243,8 @@ int main(int, char *[]) {
                 sliderDirection.dragging = true;
               } else if (SDL_PointInRect(&mousePoint, &sliderSize.knob)) {
                 sliderSize.dragging = true;
+              } else if (SDL_PointInRect(&mousePoint, &sliderWeight.knob)) {
+                sliderWeight.dragging = true;
               } else {
                 std::unique_ptr<Circle> userCircle = std::make_unique<Circle>(
                     Vec(e.button.x, e.button.y),
@@ -244,7 +253,8 @@ int main(int, char *[]) {
                             std::cos(M_PI * sliderDirection.value),
                         sliderSpeed.value) *
                         std::sin(M_PI * sliderDirection.value),
-                    10, 0.8);
+                    10 * std::max(sliderWeight.value, static_cast<float>(0.1)),
+                    0.8);
 
                 shapes.push_back(std::move(userCircle));
               }
@@ -254,6 +264,7 @@ int main(int, char *[]) {
               sliderSpeed.dragging = false;
               sliderDirection.dragging = false;
               sliderSize.dragging = false;
+              sliderWeight.dragging = false;
             }
           } else if (e.type == SDL_MOUSEMOTION) {
             if (sliderSpeed.dragging) {
@@ -264,6 +275,9 @@ int main(int, char *[]) {
             }
             if (sliderSize.dragging) {
               sliderSize.updateSlider(sliderSize, e.motion.x);
+            }
+            if (sliderWeight.dragging) {
+              sliderWeight.updateSlider(sliderWeight, e.motion.x);
             }
           }
         }
@@ -316,11 +330,13 @@ int main(int, char *[]) {
         sliderSpeed.draw();
         sliderDirection.draw();
         sliderSize.draw();
+        sliderWeight.draw();
 
         // Render current frame
         gTextTextures[0]->render(800, 150, gRenderer);
         gTextTextures[1]->render(800, 250, gRenderer);
         gTextTextures[2]->render(800, 350, gRenderer);
+        gTextTextures[3]->render(800, 450, gRenderer);
 
         // Update screen
         SDL_RenderPresent(gRenderer);
