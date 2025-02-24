@@ -24,7 +24,7 @@ bool Circle::collidesWithCircle(Circle &circle) {
 bool Circle::collidesWithRectangle(Rectangle &rectangle) {
   if (RectangleVsCircle(rectangle, *this)) {
     Vec normal = GetNormalRectangleVsCircle(rectangle, *this);
-    processMovement(*this, rectangle, normal);
+    processMovement(rectangle, *this, normal);
     return true;
   }
   return false;

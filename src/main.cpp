@@ -204,7 +204,7 @@ int main(int, char *[]) {
       SDL_Event e;
 
       std::unique_ptr<Rectangle> staticRec = std::make_unique<Rectangle>(
-          Vec(50, 550), Vec(550, 600), Vec(0, 0), INFINITE_MASS, 1);
+          Vec(50, 600), Vec(550, 650), Vec(0, 0), INFINITE_MASS, 1);
 
       std::unique_ptr<Rectangle> movingRec = std::make_unique<Rectangle>(
           Vec(300, 100), Vec(400, 150), Vec(0, 0), 50, 0.7);
