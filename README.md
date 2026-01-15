@@ -1,5 +1,7 @@
 # cpp-physics-engine
-this is gonna be lit
+Accurately inaccurate physics simulation with questionable performance
+
+![The Engine](images/enginePic.png)
 
 ## Building the Project
 
