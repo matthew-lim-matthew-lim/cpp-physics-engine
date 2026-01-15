@@ -12,7 +12,7 @@ public:
         coordinates_(coordinates),
         label_(label),
         texture_(LTexture()),
-        slider_(gRenderer_, {coordinates_.x, coordinates_.y, 400, 10})
+        slider_(gRenderer_, {static_cast<int>(coordinates_.x), static_cast<int>(coordinates_.y), 400, 10})
     {}
 
     void loadRender() {
