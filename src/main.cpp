@@ -280,16 +280,16 @@ int main(int, char *[]) {
             }
           } else if (e.type == SDL_MOUSEMOTION) {
             if (sliderSpeed.dragging) {
-              sliderSpeed.updateSlider(sliderSpeed, e.motion.x);
+              sliderSpeed.updateSlider(e.motion.x);
             }
             if (sliderDirection.dragging) {
-              sliderDirection.updateSlider(sliderDirection, e.motion.x);
+              sliderDirection.updateSlider(e.motion.x);
             }
             if (sliderSize.dragging) {
-              sliderSize.updateSlider(sliderSize, e.motion.x);
+              sliderSize.updateSlider(e.motion.x);
             }
             if (sliderWeight.dragging) {
-              sliderWeight.updateSlider(sliderWeight, e.motion.x);
+              sliderWeight.updateSlider(e.motion.x);
             }
           }
         }

@@ -4,19 +4,19 @@ Slider::Slider(SDL_Renderer *renderer, SDL_Rect track)
     : renderer(renderer), track(track), knob({track.x, track.y - 5, 20, 20}),
       dragging(false), value(0){};
 
-void Slider::updateSlider(Slider &slider, int mouseX) {
+void Slider::updateSlider(int mouseX) {
   // Clamp mouseX to the track's bounds
-  if (mouseX < slider.track.x) {
-    mouseX = slider.track.x;
-  } else if (mouseX > slider.track.x + slider.track.w) {
-    mouseX = slider.track.x + slider.track.w;
+  if (mouseX < track.x) {
+    mouseX = track.x;
+  } else if (mouseX > track.x + track.w) {
+    mouseX = track.x + track.w;
   }
 
   // Update the knob's x position (centering the knob on the mouse)
-  slider.knob.x = mouseX - slider.knob.w / 2;
+  knob.x = mouseX - knob.w / 2;
 
   // Calculate the slider's value based on knob position
-  slider.value = float(mouseX - slider.track.x) / slider.track.w;
+  value = float(mouseX - track.x) / track.w;
 }
 
 void Slider::draw() {
