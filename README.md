@@ -1,6 +1,41 @@
 # cpp-physics-engine
 this is gonna be lit
 
+## Building the Project
+
+At ResMed, we used [Conan](https://conan.io/) for C++ package management. It caused a lot of trouble but more importantly, now I can finally include package management into `cpp=physics-engine`!
+
+### Prerequisites
+- C++ compiler with C++20 support (g++)
+- Make
+- Conan 2.x (`pip install conan`)
+
+### Build Steps
+
+1. Install dependencies with Conan:
+```bash
+conan install . --output-folder=build --build=missing
+```
+
+2. Build the project:
+```bash
+cd src
+make
+```
+
+3. Run the executable:
+```bash
+./program
+```
+
+### Clean Build
+```bash
+cd src
+make clean
+```
+
+# Physics concepts simulated
+
 ## Gravity
 
 Gravity is simply a constant acceleration $9.8 ms^{-2}$ downwards. 

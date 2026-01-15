@@ -3,11 +3,19 @@
 # Compiler
 CXX = g++
 
+# Conan build directory
+CONAN_BUILD_DIR = ../build
+
+# Use pkg-config to get Conan-managed dependencies
+PKG_CONFIG_PATH := $(CONAN_BUILD_DIR):$(PKG_CONFIG_PATH)
+export PKG_CONFIG_PATH
+
 # Compiler flags
 CXXFLAGS = -O3 -Wall -Wextra -std=c++20
+CXXFLAGS += $(shell PKG_CONFIG_PATH=$(CONAN_BUILD_DIR) pkg-config --cflags sdl2 SDL2_image SDL2_ttf 2>/dev/null || echo "")
 
 # Libraries
-LDFLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf
+LDFLAGS = $(shell PKG_CONFIG_PATH=$(CONAN_BUILD_DIR) pkg-config --libs sdl2 SDL2_image SDL2_ttf 2>/dev/null || echo "-lSDL2 -lSDL2_image -lSDL2_ttf")
 
 # Source files
 SRC = main.cpp Ui/Slider.cpp Utility/Vec.cpp Utility/LTexture.cpp Shapes/Shape.cpp Shapes/Rectangle.cpp Shapes/Circle.cpp 

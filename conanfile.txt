@@ -1,0 +1,13 @@
+[requires]
+sdl/2.32.10
+sdl_image/2.8.8
+sdl_ttf/2.24.0
+
+[generators]
+PkgConfigDeps
+AutotoolsDeps
+
+[options]
+sdl/*:shared=True
+sdl_image/*:shared=True
+sdl_ttf/*:shared=True

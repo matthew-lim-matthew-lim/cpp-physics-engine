@@ -1,2 +1,7 @@
 scrapbook.md
 obj
+src/program
+
+# Conan
+build/
+CMakeUserPresets.json
