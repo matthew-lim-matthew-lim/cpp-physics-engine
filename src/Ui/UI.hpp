@@ -87,20 +87,24 @@ public:
         sliderDirection_.draw();
         sliderSize_.draw();
         sliderWeight_.draw();
+
+        gTextTextures_[0]->render(800, 150, gRenderer_);
+        gTextTextures_[1]->render(800, 250, gRenderer_);
+        gTextTextures_[2]->render(800, 350, gRenderer_);
+        gTextTextures_[3]->render(800, 450, gRenderer_);
     }
 
-    static std::optional<UI> create(std::vector<std::unique_ptr<LTexture>>& gTextTextures,
-        SDL_Renderer *gRenderer
-    ) {
+    static std::optional<UI> create(SDL_Renderer *gRenderer) {
         try {
-            return UI(gTextTextures, gRenderer);
+            return UI(gRenderer);
         } catch (...) {
             return std::nullopt;
         }
     }
 
 private:
-    std::vector<std::unique_ptr<LTexture>>& gTextTextures_;
+    // Rendered text textures
+    std::vector<std::unique_ptr<LTexture>> gTextTextures_;
     SDL_Renderer *gRenderer_ = NULL;
 
     SDL_Event e_;
@@ -110,9 +114,7 @@ private:
     Slider sliderSize_;
     Slider sliderWeight_;
 
-    UI(std::vector<std::unique_ptr<LTexture>>& gTextTextures,
-        SDL_Renderer *gRenderer
-    ) : gTextTextures_(gTextTextures), 
+    UI(SDL_Renderer *gRenderer) :
         gRenderer_(gRenderer),
         sliderSpeed_(gRenderer_, {800, 200, 400, 10}),
         sliderDirection_(gRenderer_, {800, 300, 400, 10}),

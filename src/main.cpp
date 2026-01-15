@@ -43,8 +43,6 @@ SDL_Renderer *gRenderer = NULL;
 // Globally used font
 TTF_Font *gFont = NULL;
 
-// Rendered texture
-std::vector<std::unique_ptr<LTexture>> gTextTextures;
 
 bool init() {
   // Initialization flag
@@ -101,11 +99,6 @@ bool init() {
 }
 
 void close() {
-  // Free loaded images
-  for (size_t i = 0; i < gTextTextures.size(); i++) {
-    gTextTextures[i]->free();
-  }
-
   // Free global font
   TTF_CloseFont(gFont);
   gFont = NULL;
@@ -176,7 +169,7 @@ int main(int, char *[]) {
     shapes.push_back(std::move(movingCircle));
 
     // load the media (sliders and display)
-    std::optional<UI> ui = UI::create(gTextTextures, gRenderer);
+    std::optional<UI> ui = UI::create(gRenderer);
     if (!ui) {
       std::cerr << "Failed to load ui." << std::endl;
     }
@@ -232,12 +225,6 @@ int main(int, char *[]) {
       }
 
       ui->drawMedia();
-
-      // Render current frame
-      gTextTextures[0]->render(800, 150, gRenderer);
-      gTextTextures[1]->render(800, 250, gRenderer);
-      gTextTextures[2]->render(800, 350, gRenderer);
-      gTextTextures[3]->render(800, 450, gRenderer);
 
       // Update screen
       SDL_RenderPresent(gRenderer);
