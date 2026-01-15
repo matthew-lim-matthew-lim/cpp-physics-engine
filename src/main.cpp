@@ -110,7 +110,7 @@ bool initMedia(Slider& sliderSpeed, Slider& sliderDirection, Slider& sliderSize,
     success = false;
   } else {
     // Render text
-    SDL_Color textColor = {0, 0, 0};
+    SDL_Color textColor = {0, 0, 0, 0};
     gTextTextures.push_back(std::make_unique<LTexture>(LTexture()));
     if (!gTextTextures.back()->loadFromRenderedText("Speed: " + std::to_string(sliderSpeed.value), textColor,
                                                     gRenderer, gFont)) {
@@ -141,7 +141,7 @@ bool initMedia(Slider& sliderSpeed, Slider& sliderDirection, Slider& sliderSize,
 }
 
 void loadMedia(Slider& sliderSpeed, Slider& sliderDirection, Slider& sliderSize, Slider& sliderWeight) {
-  SDL_Color textColor = {0, 0, 0};
+  SDL_Color textColor = {0, 0, 0, 0};
   gTextTextures[0]->loadFromRenderedText("Speed: " +
     std::to_string(sliderSpeed.value), textColor, gRenderer, gFont);
   gTextTextures[1]->loadFromRenderedText("Direction: " +
