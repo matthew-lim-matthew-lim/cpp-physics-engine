@@ -65,3 +65,8 @@ I knew that because it was necessary to have a different function for different 
 I considered using basic polymorphism, where I would have a `collidesWith()` virtual method in `Shape.hpp` that would be resolved in each class with dynamic casting (into the actual type of the shape). However this still requires modifying every shape class when a new shape is added and `dynamic_cast` is not performative. Moreover, this approach doesn't really make use of useful C++ features. The use of `dynamic_cast` gives this approach the name 'Dynamic Dispatch'.
 
 I decided to use `std::variant` which isn't OOP which means less coupling from the get-go. It is very useful in this scenario because it localises the collision logic to `Shape.cpp`, reducing any *Shotgun Surgery* code smell. It also provides a performance boost since no vtable lookup is required (because there are no virtual functions, because it is not actual polymorphism). `std::variant` is a type-safe union where using it with the associated function `std::visit`, we can determine the correct shape collision function to call within one function, and in a performative way.
+
+# Improvements to make:
+
+- Currently, it will calculate the movement by going iteratively through each shape. This is not good because the later shapes will be affected by the changes in the earlier shapes. For a realistic simulation, the movement should be calculated such that the order of calculation does not matter.
+- Multithreading: Rendering multithreading (lower priority), and collision calculation multithreading (higher priority). 
