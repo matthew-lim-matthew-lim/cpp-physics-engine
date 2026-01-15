@@ -1,8 +1,12 @@
 #include "Slider.hpp"
 
 Slider::Slider(SDL_Renderer *renderer, SDL_Rect track)
-    : renderer(renderer), track(track), knob({track.x, track.y - 5, 20, 20}),
-      dragging(false), value(0){};
+    : renderer(renderer), 
+      track(track),
+      knob({track.x, track.y - 5, 20, 20}),
+      dragging(false),
+      value(0)
+{};
 
 void Slider::updateSlider(int mouseX) {
   // Clamp mouseX to the track's bounds
