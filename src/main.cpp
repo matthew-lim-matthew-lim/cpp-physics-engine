@@ -245,7 +245,9 @@ int main(int, char *[]) {
           // User requests quit
           if (e.type == SDL_QUIT) {
             quit = true;
-          } else if (e.type == SDL_MOUSEBUTTONDOWN) {
+          }
+          
+          if (e.type == SDL_MOUSEBUTTONDOWN) {
             if (e.button.button == SDL_BUTTON_LEFT) {
               // Check if mouse is inside the knob rectangle
               SDL_Point mousePoint = {e.button.x, e.button.y};
@@ -271,14 +273,18 @@ int main(int, char *[]) {
                 shapes.push_back(std::move(userCircle));
               }
             }
-          } else if (e.type == SDL_MOUSEBUTTONUP) {
+          }
+          
+          if (e.type == SDL_MOUSEBUTTONUP) {
             if (e.button.button == SDL_BUTTON_LEFT) {
               sliderSpeed.dragging = false;
               sliderDirection.dragging = false;
               sliderSize.dragging = false;
               sliderWeight.dragging = false;
             }
-          } else if (e.type == SDL_MOUSEMOTION) {
+          }
+          
+          if (e.type == SDL_MOUSEMOTION) {
             if (sliderSpeed.dragging) {
               sliderSpeed.updateSlider(e.motion.x);
             }
