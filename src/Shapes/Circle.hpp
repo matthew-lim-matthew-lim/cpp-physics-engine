@@ -10,7 +10,8 @@ public:
   float radius;
 
   // Constructor
-  Circle(Vec a, float b, Vec velocity, float d, float e);
+  Circle(Vec center, float radius, Vec velocity, float mass,
+    float elasticity);
 
   bool collidesWith(Shape &other) override;
 
