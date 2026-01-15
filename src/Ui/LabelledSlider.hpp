@@ -1,7 +1,12 @@
 #ifndef LABELLED_SLIDER_HPP
 #define LABELLED_SLIDER_HPP
 
-#include <iostream>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+#include <string>
+#include "Slider.hpp"
+#include "../Utility/Vec.hpp"
+#include "../Utility/LTexture.hpp"
 
 class LabelledSlider {
 public:
@@ -15,39 +20,17 @@ public:
         slider_(gRenderer_, {static_cast<int>(coordinates_.x), static_cast<int>(coordinates_.y), 400, 10})
     {}
 
-    void loadRender() {
-        TTF_Font *gFont = TTF_OpenFont("fontCenturyGothic.ttf", 28);
-        if (!texture_.loadFromRenderedText(label_ + ": " + std::to_string(slider_.value), defaultTextColour, gRenderer_, gFont)) {
-            std::cerr << "loadRender(): Error loading from rendered text: " << label_ << std::endl;
-        } 
-    }
+    void loadRender();
 
-    void drawAndRender() {
-        slider_.draw();
-        texture_.render(coordinates_.x, coordinates_.y - 50, gRenderer_);
-    }
+    void drawAndRender();
 
-    bool pointInKnob(SDL_Point& mousePoint) {
-        if (SDL_PointInRect(&mousePoint, &slider_.knob)) {
-            slider_.dragging = true;
-            return true;
-        }
-        return false;
-    }
+    bool pointInKnob(SDL_Point& mousePoint);
 
-    void resetDragging() {
-        slider_.dragging = false;
-    }
+    void resetDragging();
 
-    void tryUpdateSliderPosition(float x) {
-        if (slider_.dragging) {
-            slider_.updateSlider(x);
-        }
-    }
+    void tryUpdateSliderPosition(float x);
 
-    float getSliderValue() {
-        return slider_.value;
-    }
+    float getSliderValue();
 
 private:
     SDL_Renderer *gRenderer_;
