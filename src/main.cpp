@@ -169,15 +169,12 @@ int main(int, char *[]) {
     shapes.push_back(std::move(movingCircle));
 
     // load the media (sliders and display)
-    std::optional<UI> ui = UI::create(gRenderer);
-    if (!ui) {
-      std::cerr << "Failed to load ui." << std::endl;
-    }
+    UI ui(gRenderer);
 
     // While application is running
     while (!quit) {
-      ui->processPollEvents(quit, shapes);
-      ui->loadMedia();
+      ui.processPollEvents(quit, shapes);
+      ui.loadMedia();
 
       // Calculate deltaTime for movement
       LAST = NOW;
@@ -224,7 +221,7 @@ int main(int, char *[]) {
         }
       }
 
-      ui->drawMedia();
+      ui.drawMedia();
 
       // Update screen
       SDL_RenderPresent(gRenderer);
