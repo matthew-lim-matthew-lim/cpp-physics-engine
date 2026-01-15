@@ -99,7 +99,7 @@ bool init() {
   return success;
 }
 
-bool loadMedia() {
+bool initMedia(Slider& sliderSpeed, Slider& sliderDirection, Slider& sliderSize, Slider& sliderWeight) {
   // Loading success flag
   bool success = true;
 
@@ -112,25 +112,25 @@ bool loadMedia() {
     // Render text
     SDL_Color textColor = {0, 0, 0};
     gTextTextures.push_back(std::make_unique<LTexture>(LTexture()));
-    if (!gTextTextures.back()->loadFromRenderedText("Speed", textColor,
+    if (!gTextTextures.back()->loadFromRenderedText("Speed: " + std::to_string(sliderSpeed.value), textColor,
                                                     gRenderer, gFont)) {
       printf("Failed to render text texture!\n");
       success = false;
     }
     gTextTextures.push_back(std::make_unique<LTexture>(LTexture()));
-    if (!gTextTextures.back()->loadFromRenderedText("Direction", textColor,
+    if (!gTextTextures.back()->loadFromRenderedText("Direction: " + std::to_string(sliderDirection.value), textColor,
                                                     gRenderer, gFont)) {
       printf("Failed to render text texture!\n");
       success = false;
     }
     gTextTextures.push_back(std::make_unique<LTexture>(LTexture()));
-    if (!gTextTextures.back()->loadFromRenderedText("Size", textColor,
+    if (!gTextTextures.back()->loadFromRenderedText("Size: " + std::to_string(sliderSize.value), textColor,
                                                     gRenderer, gFont)) {
       printf("Failed to render text texture!\n");
       success = false;
     }
     gTextTextures.push_back(std::make_unique<LTexture>(LTexture()));
-    if (!gTextTextures.back()->loadFromRenderedText("Mass", textColor,
+    if (!gTextTextures.back()->loadFromRenderedText("Mass: " + std::to_string(sliderWeight.value), textColor,
                                                     gRenderer, gFont)) {
       printf("Failed to render text texture!\n");
       success = false;
@@ -138,6 +138,18 @@ bool loadMedia() {
   }
 
   return success;
+}
+
+void loadMedia(Slider& sliderSpeed, Slider& sliderDirection, Slider& sliderSize, Slider& sliderWeight) {
+  SDL_Color textColor = {0, 0, 0};
+  gTextTextures[0]->loadFromRenderedText("Speed: " +
+    std::to_string(sliderSpeed.value), textColor, gRenderer, gFont);
+  gTextTextures[1]->loadFromRenderedText("Direction: " +
+    std::to_string(sliderDirection.value), textColor, gRenderer, gFont);
+  gTextTextures[2]->loadFromRenderedText("Size: " +
+    std::to_string(sliderSize.value), textColor, gRenderer, gFont);
+  gTextTextures[3]->loadFromRenderedText("Mass: " +
+    std::to_string(sliderWeight.value), textColor, gRenderer, gFont);
 }
 
 void close() {
@@ -193,39 +205,39 @@ int main(int, char *[]) {
   if (!init()) {
     printf("Failed to initialize!\n");
   } else {
-    // Load media
-    if (!loadMedia()) {
-      printf("Failed to load media!\n");
+    // Main loop flag
+    bool quit = false;
+
+    // Event handler
+    SDL_Event e;
+
+    std::unique_ptr<Rectangle> staticRec = std::make_unique<Rectangle>(
+        Vec(50, 600), Vec(550, 650), Vec(0, 0), INFINITE_MASS, 1);
+
+    std::unique_ptr<Rectangle> movingRec = std::make_unique<Rectangle>(
+        Vec(300, 100), Vec(400, 150), Vec(0, 0), 50, 0.7);
+
+    std::unique_ptr<Circle> movingCircle =
+        std::make_unique<Circle>(Vec(200, 100), 60, Vec(0, 0), 10, 0.8);
+
+    Uint64 NOW = SDL_GetPerformanceCounter();
+    Uint64 LAST = 0;
+    double deltaTime = 0;
+
+    std::vector<std::unique_ptr<Shape>> shapes;
+    shapes.push_back(std::move(staticRec));
+    shapes.push_back(std::move(movingRec));
+    shapes.push_back(std::move(movingCircle));
+
+    Slider sliderSpeed = Slider(gRenderer, {800, 200, 400, 10});
+    Slider sliderDirection = Slider(gRenderer, {800, 300, 400, 10});
+    Slider sliderSize = Slider(gRenderer, {800, 400, 400, 10});
+    Slider sliderWeight = Slider(gRenderer, {800, 500, 400, 10});
+
+    // load the media (sliders and display)
+    if (!initMedia(sliderSpeed, sliderDirection, sliderSize, sliderWeight)) {
+      printf("Media (sliders and dispay) faied to load");
     } else {
-      // Main loop flag
-      bool quit = false;
-
-      // Event handler
-      SDL_Event e;
-
-      std::unique_ptr<Rectangle> staticRec = std::make_unique<Rectangle>(
-          Vec(50, 600), Vec(550, 650), Vec(0, 0), INFINITE_MASS, 1);
-
-      std::unique_ptr<Rectangle> movingRec = std::make_unique<Rectangle>(
-          Vec(300, 100), Vec(400, 150), Vec(0, 0), 50, 0.7);
-
-      std::unique_ptr<Circle> movingCircle =
-          std::make_unique<Circle>(Vec(200, 100), 60, Vec(0, 0), 10, 0.8);
-
-      Uint64 NOW = SDL_GetPerformanceCounter();
-      Uint64 LAST = 0;
-      double deltaTime = 0;
-
-      std::vector<std::unique_ptr<Shape>> shapes;
-      shapes.push_back(std::move(staticRec));
-      shapes.push_back(std::move(movingRec));
-      shapes.push_back(std::move(movingCircle));
-
-      Slider sliderSpeed = Slider(gRenderer, {800, 200, 400, 10});
-      Slider sliderDirection = Slider(gRenderer, {800, 300, 400, 10});
-      Slider sliderSize = Slider(gRenderer, {800, 400, 400, 10});
-      Slider sliderWeight = Slider(gRenderer, {800, 500, 400, 10});
-
       // While application is running
       while (!quit) {
         // Handle events on queue
@@ -282,6 +294,9 @@ int main(int, char *[]) {
           }
         }
 
+        // Update the media (sliders and display)
+        loadMedia(sliderSpeed, sliderDirection, sliderSize, sliderWeight);
+
         // Calculate deltaTime for movement
         LAST = NOW;
         NOW = SDL_GetPerformanceCounter();
@@ -317,7 +332,7 @@ int main(int, char *[]) {
                   circlePtr->center.y + circlePtr->radius * std::sin(i));
             }
           } else if (auto rectPtr =
-                         dynamic_cast<Rectangle *>(shapes[i].get())) {
+                          dynamic_cast<Rectangle *>(shapes[i].get())) {
             SDL_Rect recColored = {
                 (int)rectPtr->tlPoint.x, (int)rectPtr->tlPoint.y,
                 (int)(rectPtr->brPoint.x - rectPtr->tlPoint.x),
