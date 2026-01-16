@@ -143,6 +143,17 @@ const float INFINITE_MASS = 0;
 
 Vec cameraOffset;
 
+void drawCircleLines(SDL_Renderer* renderer, float x, float y, float r) {
+  const int segments = 32; // Enough to look round
+  SDL_Point points[segments + 1];
+  for (int i = 0; i <= segments; i++) {
+      float angle = i * (2.0f * M_PI / segments);
+      points[i].x = x + r * cos(angle);
+      points[i].y = y + r * sin(angle);
+  }
+  SDL_RenderDrawLines(renderer, points, segments + 1);
+}
+
 int main(int, char *[]) {
   // Start up SDL and create window
   if (!init()) {
@@ -216,12 +227,14 @@ int main(int, char *[]) {
 
       for (std::size_t i = 0; i < shapes.size(); i++) {
         if (auto circlePtr = dynamic_cast<Circle *>(shapes[i].get())) {
-          for (double i = 0; i < 2 * M_PI; i += 0.001) {
+          for (double i = 0; i < 2 * M_PI; i += 0.1) {
             SDL_RenderDrawPoint(
                 gRenderer,
                 circlePtr->center.x + (int)cameraOffset.x + circlePtr->radius * std::cos(i),
                 circlePtr->center.y + (int)cameraOffset.y + circlePtr->radius * std::sin(i));
           }
+          drawCircleLines(gRenderer, circlePtr->center.x + (int)cameraOffset.x,
+            circlePtr->center.y + (int)cameraOffset.y, circlePtr->radius);
         } else if (auto rectPtr =
                         dynamic_cast<Rectangle *>(shapes[i].get())) {
           SDL_Rect recColored = {

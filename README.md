@@ -72,6 +72,13 @@ I considered using basic polymorphism, where I would have a `collidesWith()` vir
 
 I decided to use `std::variant` which isn't OOP which means less coupling from the get-go. It is very useful in this scenario because it localises the collision logic to `Shape.cpp`, reducing any *Shotgun Surgery* code smell. It also provides a performance boost since no vtable lookup is required (because there are no virtual functions, because it is not actual polymorphism). `std::variant` is a type-safe union where using it with the associated function `std::visit`, we can determine the correct shape collision function to call within one function, and in a performative way.
 
+# Engineering logbook
+
+### Optimised circle rendering algorithm
+- Improved observed fps by approx 10fps (30fps -> 40fps) by using a polygon approximation of circles to render them using lines, as opposed to the orginal algorithm which would use trigonometry to draw dots to make up the entire circle. 
+- The new algorithm significantly reduces calls (in the count of thousands) to `sin()` and `cos()` which are costly CPU calls. It allows the SDL library to cleverly handle the rendering of the lines which make up the polygonal edges of the 'circle'. The obvious downside is that the graphical representation of the circles is not their true simulated shape.
+- The performance boost is most noticeable when the number of objects simulated is large. With the optimisation, simulating large numbers of objects is a much more pleasant experience.
+
 # Improvements to make:
 
 - Currently, it will calculate the movement by going iteratively through each shape. This is not good because the later shapes will be affected by the changes in the earlier shapes. For a realistic simulation, the movement should be calculated such that the order of calculation does not matter.
