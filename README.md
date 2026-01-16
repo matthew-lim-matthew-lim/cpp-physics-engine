@@ -3,6 +3,12 @@ Accurately inaccurate physics simulation with questionable performance
 
 ![The Engine](images/enginePic.png)
 
+## Controls
+
+- Use the sliders to configure the next shape you will add to the simulation environment.
+- Click to instantiate a shape at the position of your mouse pointer.
+- Use the arrow keys to move the camera around the environment.
+
 ## Building the Project
 
 At ResMed, we used [Conan](https://conan.io/) for C++ package management. It caused a lot of trouble but more importantly, now I can finally include package management into `cpp=physics-engine`!
