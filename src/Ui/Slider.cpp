@@ -8,6 +8,14 @@ Slider::Slider(SDL_Renderer *renderer, SDL_Rect track)
       value(0)
 {};
 
+Slider::Slider(SDL_Renderer *renderer, SDL_Rect track, float initialSliderPos)
+    : renderer(renderer), 
+      track(track),
+      knob({track.x + (int)(initialSliderPos * track.w), track.y - 5, 20, 20}),
+      dragging(false),
+      value(initialSliderPos)
+{};
+
 void Slider::updateSlider(int mouseX) {
   // Clamp mouseX to the track's bounds
   if (mouseX < track.x) {

@@ -32,7 +32,8 @@ public:
             std::make_unique<LabelledSlider>(
                 gRenderer_, 
                 Vec(800, 300),
-                "Direction"
+                "Direction",
+                0.5
             )
         );
 
@@ -51,6 +52,16 @@ public:
                 gRenderer_, 
                 Vec(800, 500),
                 "Weight"
+            )
+        );
+
+        labelledSliders_.emplace(
+            "Restitution",
+            std::make_unique<LabelledSlider>(
+                gRenderer_, 
+                Vec(800, 600),
+                "Restitution",
+                0.8
             )
         );
     }
@@ -77,7 +88,7 @@ public:
             displayShape->velocity.y = std::pow(labelledSliders_["Speed"]->getSliderValue() * 10, 0.5) *
                 std::sin(M_PI * labelledSliders_["Direction"]->getSliderValue());
             displayShape->mass = std::pow(std::max(labelledSliders_["Weight"]->getSliderValue() * 10, static_cast<float>(0.1)), 2);
-            displayShape->elasticity = 0.8;
+            displayShape->elasticity = labelledSliders_["Restitution"]->getSliderValue();
 
             if (e_.type == SDL_MOUSEBUTTONDOWN) {
                 if (e_.button.button == SDL_BUTTON_LEFT) {

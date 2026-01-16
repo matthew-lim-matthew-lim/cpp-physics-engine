@@ -15,6 +15,8 @@ public:
 
   Slider(SDL_Renderer *renderer, SDL_Rect track);
 
+  Slider(SDL_Renderer *renderer, SDL_Rect track, float initialSliderPos);
+
   void updateSlider(int mouseX);
 
   void draw();

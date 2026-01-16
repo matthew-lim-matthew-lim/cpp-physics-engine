@@ -20,6 +20,14 @@ public:
         slider_(gRenderer_, {static_cast<int>(coordinates_.x), static_cast<int>(coordinates_.y), 400, 10})
     {}
 
+    LabelledSlider(SDL_Renderer *gRenderer, Vec coordinates, std::string label, float initialSliderPos) : 
+        gRenderer_(gRenderer), 
+        coordinates_(coordinates),
+        label_(label),
+        texture_(LTexture()),
+        slider_(gRenderer_, {static_cast<int>(coordinates_.x), static_cast<int>(coordinates_.y), 400, 10}, initialSliderPos)
+    {}
+
     void loadRender();
 
     void drawAndRender();
