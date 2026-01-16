@@ -2,6 +2,7 @@
 #define UI_HPP
 
 #include "./LabelledSlider.hpp"
+#include "./FpsCounter.hpp"
 
 #include <optional>
 #include <vector>
@@ -11,7 +12,8 @@
 class UI {
 public:
     UI(SDL_Renderer *gRenderer) :
-        gRenderer_(gRenderer)
+        gRenderer_(gRenderer),
+        fpsCounter_(gRenderer)
     {
         labelledSliders_.emplace(
             "Speed",
@@ -100,18 +102,23 @@ public:
         for (std::pair<const std::string, std::unique_ptr<LabelledSlider>>& labelledslider : labelledSliders_) {
             labelledslider.second->loadRender();
         }
+
+        fpsCounter_.loadMedia();
     }
 
     void drawMedia() {
         for (std::pair<const std::string, std::unique_ptr<LabelledSlider>>& labelledslider : labelledSliders_) {
             labelledslider.second->drawAndRender();
         }
+        
+        fpsCounter_.drawAndRender();
     }
 
 private:
     // Rendered text textures
-    std::unordered_map<std::string, std::unique_ptr<LabelledSlider>> labelledSliders_;
     SDL_Renderer *gRenderer_ = NULL;
+    std::unordered_map<std::string, std::unique_ptr<LabelledSlider>> labelledSliders_;
+    FpsCounter fpsCounter_;
 
     SDL_Event e_;
 };
