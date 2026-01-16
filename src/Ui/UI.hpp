@@ -72,11 +72,11 @@ public:
             displayShape->center.x = e_.button.x - camPosition_.getX();
             displayShape->center.y = e_.button.y - camPosition_.getY();
             displayShape->radius = 100 * std::max(labelledSliders_["Size"]->getSliderValue(), static_cast<float>(0.1));
-            displayShape->velocity.x = labelledSliders_["Speed"]->getSliderValue() *
+            displayShape->velocity.x = std::pow(labelledSliders_["Speed"]->getSliderValue() * 10, 0.5) *
                 std::cos(M_PI * labelledSliders_["Direction"]->getSliderValue());
-            displayShape->velocity.y = labelledSliders_["Speed"]->getSliderValue() *
+            displayShape->velocity.y = std::pow(labelledSliders_["Speed"]->getSliderValue() * 10, 0.5) *
                 std::sin(M_PI * labelledSliders_["Direction"]->getSliderValue());
-            displayShape->mass = 10 * std::max(labelledSliders_["Weight"]->getSliderValue(), static_cast<float>(0.1));
+            displayShape->mass = std::pow(std::max(labelledSliders_["Weight"]->getSliderValue() * 10, static_cast<float>(0.1)), 2);
             displayShape->elasticity = 0.8;
 
             if (e_.type == SDL_MOUSEBUTTONDOWN) {
