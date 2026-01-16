@@ -158,6 +158,9 @@ int main(int, char *[]) {
     std::unique_ptr<Rectangle> staticRec = std::make_unique<Rectangle>(
         Vec(50, 600), Vec(550, 650), Vec(0, 0), INFINITE_MASS, 1);
 
+    std::unique_ptr<Rectangle> floorRec = std::make_unique<Rectangle>(
+        Vec(-1000, 2000), Vec(2000, 2050), Vec(0, 0), INFINITE_MASS, 1);
+
     std::unique_ptr<Rectangle> movingRec = std::make_unique<Rectangle>(
         Vec(300, 100), Vec(400, 150), Vec(0, 0), 50, 0.7);
 
@@ -171,6 +174,7 @@ int main(int, char *[]) {
     std::vector<std::unique_ptr<Shape>> shapes;
     shapes.push_back(std::move(displayShape));
     shapes.push_back(std::move(staticRec));
+    shapes.push_back(std::move(floorRec));
     shapes.push_back(std::move(movingRec));
     shapes.push_back(std::move(movingCircle));
 
