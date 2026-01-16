@@ -60,6 +60,17 @@ public:
                 quit = true;
             }
             
+            auto displayShape = dynamic_cast<Circle *>(shapes[0].get());
+            displayShape->center.x = e_.button.x;
+            displayShape->center.y = e_.button.y;
+            displayShape->radius = 100 * std::max(labelledSliders_["Size"]->getSliderValue(), static_cast<float>(0.1));
+            displayShape->velocity.x = labelledSliders_["Speed"]->getSliderValue() *
+                std::cos(M_PI * labelledSliders_["Direction"]->getSliderValue());
+            displayShape->velocity.y = labelledSliders_["Speed"]->getSliderValue() *
+                std::sin(M_PI * labelledSliders_["Direction"]->getSliderValue());
+            displayShape->mass = 10 * std::max(labelledSliders_["Weight"]->getSliderValue(), static_cast<float>(0.1));
+            displayShape->elasticity = 0.8;
+
             if (e_.type == SDL_MOUSEBUTTONDOWN) {
                 if (e_.button.button == SDL_BUTTON_LEFT) {
                     // Check if mouse is inside the knob rectangle
@@ -68,17 +79,9 @@ public:
                     for (std::pair<const std::string, std::unique_ptr<LabelledSlider>>& labelledslider : labelledSliders_) {
                         knobClicked |= labelledslider.second->pointInKnob(mousePoint);
                     }
-                    if (!knobClicked) {
-                        std::unique_ptr<Circle> userCircle = std::make_unique<Circle>(
-                            Vec(e_.button.x, e_.button.y),
-                            100 * std::max(labelledSliders_["Size"]->getSliderValue(), static_cast<float>(0.1)),
-                            Vec(labelledSliders_["Speed"]->getSliderValue() *
-                                    std::cos(M_PI * labelledSliders_["Direction"]->getSliderValue()),
-                                labelledSliders_["Speed"]->getSliderValue()) *
-                                std::sin(M_PI * labelledSliders_["Direction"]->getSliderValue()),
-                            10 * std::max(labelledSliders_["Weight"]->getSliderValue(), static_cast<float>(0.1)),
-                            0.8);
 
+                    if (!knobClicked) {
+                        std::unique_ptr<Circle> userCircle = std::make_unique<Circle>(*displayShape);
                         shapes.push_back(std::move(userCircle));
                     }
                 }

@@ -150,6 +150,9 @@ int main(int, char *[]) {
     bool quit = false;
 
     // Event handler
+    std::unique_ptr<Circle> displayShape =
+        std::make_unique<Circle>(Vec(500, 500), 60, Vec(0, 0), INFINITE_MASS, 0.8);
+
     std::unique_ptr<Rectangle> staticRec = std::make_unique<Rectangle>(
         Vec(50, 600), Vec(550, 650), Vec(0, 0), INFINITE_MASS, 1);
 
@@ -164,6 +167,7 @@ int main(int, char *[]) {
     double deltaTime = 0;
 
     std::vector<std::unique_ptr<Shape>> shapes;
+    shapes.push_back(std::move(displayShape));
     shapes.push_back(std::move(staticRec));
     shapes.push_back(std::move(movingRec));
     shapes.push_back(std::move(movingCircle));
@@ -183,7 +187,8 @@ int main(int, char *[]) {
           (double)((NOW - LAST) / (double)SDL_GetPerformanceFrequency());
 
       // Process collisions
-      for (std::size_t i = 0; i < shapes.size(); i++) {
+      // Skip `shapes[0]` as that is the display shape (shape on user's cursor)
+      for (std::size_t i = 1; i < shapes.size(); i++) {
         for (std::size_t j = i + 1; j < shapes.size(); j++) {
           if (shapes[i]->mass != INFINITE_MASS) {
             shapes[i]->velocity.y += (9.8 / SPEED_SCALE) * deltaTime;
@@ -201,6 +206,7 @@ int main(int, char *[]) {
       // Clear screen
       SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
       SDL_RenderClear(gRenderer);
+      SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
 
       for (std::size_t i = 0; i < shapes.size(); i++) {
         if (auto circlePtr = dynamic_cast<Circle *>(shapes[i].get())) {
@@ -216,7 +222,6 @@ int main(int, char *[]) {
               (int)rectPtr->tlPoint.x, (int)rectPtr->tlPoint.y,
               (int)(rectPtr->brPoint.x - rectPtr->tlPoint.x),
               (int)(rectPtr->brPoint.y - rectPtr->tlPoint.y)};
-          SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
           SDL_RenderDrawRect(gRenderer, &recColored);
         }
       }
