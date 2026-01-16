@@ -3,6 +3,8 @@
 
 #include "./LabelledSlider.hpp"
 #include "./FpsCounter.hpp"
+#include "../Utility/Vec.hpp"
+#include "./CameraPositionDisplay.hpp"
 
 #include <optional>
 #include <vector>
@@ -11,9 +13,10 @@
 
 class UI {
 public:
-    UI(SDL_Renderer *gRenderer) :
+    UI(SDL_Renderer *gRenderer, Vec& cameraOffset) :
         gRenderer_(gRenderer),
-        fpsCounter_(gRenderer)
+        fpsCounter_(gRenderer),
+        camPosition_(gRenderer, cameraOffset)
     {
         labelledSliders_.emplace(
             "Speed",
@@ -59,10 +62,15 @@ public:
             if (e_.type == SDL_QUIT) {
                 quit = true;
             }
+
+            // Camera movement (arrow keys)
+            camPosition_.checkCameraMovement(e_);
+
+            // Mouse stuff
             
             auto displayShape = dynamic_cast<Circle *>(shapes[0].get());
-            displayShape->center.x = e_.button.x;
-            displayShape->center.y = e_.button.y;
+            displayShape->center.x = e_.button.x - camPosition_.getX();
+            displayShape->center.y = e_.button.y - camPosition_.getY();
             displayShape->radius = 100 * std::max(labelledSliders_["Size"]->getSliderValue(), static_cast<float>(0.1));
             displayShape->velocity.x = labelledSliders_["Speed"]->getSliderValue() *
                 std::cos(M_PI * labelledSliders_["Direction"]->getSliderValue());
@@ -107,6 +115,8 @@ public:
         }
 
         fpsCounter_.loadMedia();
+
+        camPosition_.loadMedia();
     }
 
     void drawMedia() {
@@ -115,6 +125,8 @@ public:
         }
         
         fpsCounter_.drawAndRender();
+
+        camPosition_.drawAndRender();
     }
 
 private:
@@ -122,6 +134,7 @@ private:
     SDL_Renderer *gRenderer_ = NULL;
     std::unordered_map<std::string, std::unique_ptr<LabelledSlider>> labelledSliders_;
     FpsCounter fpsCounter_;
+    CameraPositionDisplay camPosition_;
 
     SDL_Event e_;
 };

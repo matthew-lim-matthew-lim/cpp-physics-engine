@@ -141,6 +141,8 @@ SDL_Texture *loadTexture(std::string path) {
 const int SPEED_SCALE = 100; // Higher means slower
 const float INFINITE_MASS = 0;
 
+Vec cameraOffset;
+
 int main(int, char *[]) {
   // Start up SDL and create window
   if (!init()) {
@@ -173,7 +175,7 @@ int main(int, char *[]) {
     shapes.push_back(std::move(movingCircle));
 
     // load the media (sliders and display)
-    UI ui(gRenderer);
+    UI ui(gRenderer, cameraOffset);
 
     // While application is running
     while (!quit) {
@@ -213,13 +215,13 @@ int main(int, char *[]) {
           for (double i = 0; i < 2 * M_PI; i += 0.001) {
             SDL_RenderDrawPoint(
                 gRenderer,
-                circlePtr->center.x + circlePtr->radius * std::cos(i),
-                circlePtr->center.y + circlePtr->radius * std::sin(i));
+                circlePtr->center.x + (int)cameraOffset.x + circlePtr->radius * std::cos(i),
+                circlePtr->center.y + (int)cameraOffset.y + circlePtr->radius * std::sin(i));
           }
         } else if (auto rectPtr =
                         dynamic_cast<Rectangle *>(shapes[i].get())) {
           SDL_Rect recColored = {
-              (int)rectPtr->tlPoint.x, (int)rectPtr->tlPoint.y,
+              (int)rectPtr->tlPoint.x + (int)cameraOffset.x, (int)rectPtr->tlPoint.y + (int)cameraOffset.y,
               (int)(rectPtr->brPoint.x - rectPtr->tlPoint.x),
               (int)(rectPtr->brPoint.y - rectPtr->tlPoint.y)};
           SDL_RenderDrawRect(gRenderer, &recColored);
