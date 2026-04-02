@@ -1,10 +1,11 @@
 #ifndef FPS_COUNTER_HPP
 #define FPS_COUNTER_HPP
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <string>
 #include "../Utility/LTexture.hpp"
+#include "../Utility/Font.hpp"
 
 class FpsCounter {
 public:
@@ -13,9 +14,14 @@ public:
     FpsCounter(SDL_Renderer *gRenderer) : 
         gRenderer_(gRenderer),
         texture_(LTexture()),
+        font_(openDefaultFont(28)),
         now_(SDL_GetPerformanceCounter()),
         last_(0)
     {}
+
+    ~FpsCounter() {
+        TTF_CloseFont(font_);
+    }
 
     void loadMedia() {
         if (nextFpsUpdate_== 0) {
@@ -23,8 +29,7 @@ public:
             last_ = now_;
             now_ = SDL_GetPerformanceCounter();
             double deltaTime = (double)((now_ - last_) / (double)SDL_GetPerformanceFrequency());
-            TTF_Font *gFont = TTF_OpenFont("fontCenturyGothic.ttf", 28);
-            texture_.loadFromRenderedText("FPS: " + std::to_string(10.0 / deltaTime), {0, 0, 0, 0}, gRenderer_, gFont);
+            texture_.loadFromRenderedText("FPS: " + std::to_string(10.0 / deltaTime), {0, 0, 0, 0}, gRenderer_, font_);
         } else {
             nextFpsUpdate_--;
         }
@@ -38,6 +43,7 @@ public:
 private:
     SDL_Renderer *gRenderer_ = NULL;
     LTexture texture_;
+    TTF_Font *font_;
     Uint64 now_ = 0;
     Uint64 last_ = 0;
     Uint64 nextFpsUpdate_ = 0;

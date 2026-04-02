@@ -1,8 +1,8 @@
 #include "Shape.hpp"
 #include "Circle.hpp"
 #include "Rectangle.hpp"
+#include <algorithm>
 #include <cmath>
-#include <iostream>
 
 // Determine if Rectangle vs Rectangle collision
 bool RectangleVsRectangle(const Rectangle &r1, const Rectangle &r2) {

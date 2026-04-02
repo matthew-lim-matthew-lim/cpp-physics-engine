@@ -4,9 +4,10 @@
 #include "./LabelledSlider.hpp"
 #include "./FpsCounter.hpp"
 #include "../Utility/Vec.hpp"
+#include "../Shapes/Circle.hpp"
 #include "./CameraPositionDisplay.hpp"
 
-#include <optional>
+#include <cmath>
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -70,7 +71,7 @@ public:
         // Handle events on queue
         while (SDL_PollEvent(&e_) != 0) {
             // User requests quit
-            if (e_.type == SDL_QUIT) {
+            if (e_.type == SDL_EVENT_QUIT) {
                 quit = true;
             }
 
@@ -90,10 +91,10 @@ public:
             displayShape->mass = std::pow(std::max(labelledSliders_["Weight"]->getSliderValue() * 10, static_cast<float>(0.1)), 2);
             displayShape->elasticity = labelledSliders_["Restitution"]->getSliderValue();
 
-            if (e_.type == SDL_MOUSEBUTTONDOWN) {
+            if (e_.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
                 if (e_.button.button == SDL_BUTTON_LEFT) {
                     // Check if mouse is inside the knob rectangle
-                    SDL_Point mousePoint = {e_.button.x, e_.button.y};
+                    SDL_FPoint mousePoint = {e_.button.x, e_.button.y};
                     bool knobClicked = false;
                     for (std::pair<const std::string, std::unique_ptr<LabelledSlider>>& labelledslider : labelledSliders_) {
                         knobClicked |= labelledslider.second->pointInKnob(mousePoint);
@@ -106,13 +107,13 @@ public:
                 }
             }
             
-            if (e_.type == SDL_MOUSEBUTTONUP) {
+            if (e_.type == SDL_EVENT_MOUSE_BUTTON_UP) {
                 for (std::pair<const std::string, std::unique_ptr<LabelledSlider>>& labelledslider : labelledSliders_) {
                     labelledslider.second->resetDragging();
                 }
             }
             
-            if (e_.type == SDL_MOUSEMOTION) {
+            if (e_.type == SDL_EVENT_MOUSE_MOTION) {
                 for (std::pair<const std::string, std::unique_ptr<LabelledSlider>>& labelledslider : labelledSliders_) {
                     labelledslider.second->tryUpdateSliderPosition(e_.motion.x);
                 }

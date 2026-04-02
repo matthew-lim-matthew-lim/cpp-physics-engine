@@ -1,0 +1,11 @@
+CompileFlags:
+  Compiler: g++
+  Add:
+    - -std=c++20
+    - -D_REENTRANT
+    - -I/home/matthew/.conan2/p/b/sdl_ifc04dcf6a80c6/p/include
+    - -I/home/matthew/.conan2/p/b/sdl_taeb6a8f842421/p/include
+    - -I/home/matthew/.conan2/p/b/sdl3939dbf07be26/p/include
+    - -I/home/matthew/.conan2/p/xkbco20b73ce1960a3/p/include
+    - -I/home/matthew/.conan2/p/b/pulsee273c7c233f20/p/include
+    - -I/home/matthew/.conan2/p/libsnf7a6f70f3f936/p/include

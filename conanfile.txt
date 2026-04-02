@@ -1,7 +1,7 @@
 [requires]
-sdl/2.32.10
-sdl_image/2.8.8
-sdl_ttf/2.24.0
+sdl/3.4.0
+sdl_image/3.4.0
+sdl_ttf/3.2.2
 
 [generators]
 PkgConfigDeps

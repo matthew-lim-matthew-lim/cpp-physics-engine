@@ -3,8 +3,7 @@
 #include <iostream>
 
 void LabelledSlider::loadRender() {
-    TTF_Font *gFont = TTF_OpenFont("fontCenturyGothic.ttf", 28);
-    if (!texture_.loadFromRenderedText(label_ + ": " + std::to_string(slider_.value), defaultTextColour, gRenderer_, gFont)) {
+    if (!texture_.loadFromRenderedText(label_ + ": " + std::to_string(slider_.value), defaultTextColour, gRenderer_, font_)) {
         std::cerr << "loadRender(): Error loading from rendered text: " << label_ << std::endl;
     }
 }
@@ -14,8 +13,8 @@ void LabelledSlider::drawAndRender() {
     texture_.render(coordinates_.x, coordinates_.y - 50, gRenderer_);
 }
 
-bool LabelledSlider::pointInKnob(SDL_Point& mousePoint) {
-    if (SDL_PointInRect(&mousePoint, &slider_.knob)) {
+bool LabelledSlider::pointInKnob(SDL_FPoint& mousePoint) {
+    if (SDL_PointInRectFloat(&mousePoint, &slider_.knob)) {
         slider_.dragging = true;
         return true;
     }

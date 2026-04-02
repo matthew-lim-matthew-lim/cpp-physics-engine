@@ -1,6 +1,6 @@
 #include "Slider.hpp"
 
-Slider::Slider(SDL_Renderer *renderer, SDL_Rect track)
+Slider::Slider(SDL_Renderer *renderer, SDL_FRect track)
     : renderer(renderer), 
       track(track),
       knob({track.x, track.y - 5, 20, 20}),
@@ -8,15 +8,15 @@ Slider::Slider(SDL_Renderer *renderer, SDL_Rect track)
       value(0)
 {};
 
-Slider::Slider(SDL_Renderer *renderer, SDL_Rect track, float initialSliderPos)
+Slider::Slider(SDL_Renderer *renderer, SDL_FRect track, float initialSliderPos)
     : renderer(renderer), 
       track(track),
-      knob({track.x + (int)(initialSliderPos * track.w), track.y - 5, 20, 20}),
+      knob({track.x + initialSliderPos * track.w, track.y - 5, 20, 20}),
       dragging(false),
       value(initialSliderPos)
 {};
 
-void Slider::updateSlider(int mouseX) {
+void Slider::updateSlider(float mouseX) {
   // Clamp mouseX to the track's bounds
   if (mouseX < track.x) {
     mouseX = track.x;
@@ -25,7 +25,7 @@ void Slider::updateSlider(int mouseX) {
   }
 
   // Update the knob's x position (centering the knob on the mouse)
-  knob.x = mouseX - knob.w / 2;
+  knob.x = mouseX - knob.w / 2.0f;
 
   // Calculate the slider's value based on knob position
   value = float(mouseX - track.x) / track.w;

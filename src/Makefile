@@ -12,10 +12,10 @@ export PKG_CONFIG_PATH
 
 # Compiler flags
 CXXFLAGS = -O3 -Wall -Wextra -std=c++20 -MMD -MP
-CXXFLAGS += $(shell PKG_CONFIG_PATH=$(CONAN_BUILD_DIR) pkg-config --cflags sdl2 SDL2_image SDL2_ttf 2>/dev/null || echo "")
+CXXFLAGS += $(shell PKG_CONFIG_PATH=$(CONAN_BUILD_DIR) pkg-config --cflags sdl-sdl3 sdl3-image sdl_ttf 2>/dev/null || echo "")
 
 # Libraries
-LDFLAGS = $(shell PKG_CONFIG_PATH=$(CONAN_BUILD_DIR) pkg-config --libs sdl2 SDL2_image SDL2_ttf 2>/dev/null || echo "-lSDL2 -lSDL2_image -lSDL2_ttf")
+LDFLAGS = $(shell PKG_CONFIG_PATH=$(CONAN_BUILD_DIR) pkg-config --libs sdl-sdl3 sdl3-image sdl_ttf 2>/dev/null || echo "-lSDL3 -lSDL3_image -lSDL3_ttf")
 
 # Source files
 SRC = main.cpp Ui/Slider.cpp Ui/LabelledSlider.cpp Utility/Vec.cpp Utility/LTexture.cpp Shapes/Shape.cpp Shapes/Rectangle.cpp Shapes/Circle.cpp 

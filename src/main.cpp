@@ -7,10 +7,9 @@
 #include "Ui/UI.hpp"
 
 // Using SDL, SDL_image, standard IO, math, and strings
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <cmath>
 #include <cstddef>
 #include <memory>
@@ -49,26 +48,20 @@ bool init() {
   bool success = true;
 
   // Initialize SDL
-  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+  if (!SDL_Init(SDL_INIT_VIDEO)) {
     printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
     success = false;
   } else {
-    // Set texture filtering to linear
-    if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
-      printf("Warning: Linear texture filtering not enabled!");
-    }
-
     // Create window
     gWindow = SDL_CreateWindow("Awesome Physics Engine",
-                               SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                               SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+                               SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
     if (gWindow == NULL) {
       printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
       success = false;
     } else {
       // Create renderer for window
-      gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
+      gRenderer = SDL_CreateRenderer(gWindow, NULL);
       if (gRenderer == NULL) {
         printf("Renderer could not be created! SDL Error: %s\n",
                SDL_GetError());
@@ -77,18 +70,10 @@ bool init() {
         // Initialize renderer color
         SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
-        // Initialize PNG loading
-        int imgFlags = IMG_INIT_PNG;
-        if (!(IMG_Init(imgFlags) & imgFlags)) {
-          printf("SDL_image could not initialize! SDL_image Error: %s\n",
-                 IMG_GetError());
-          success = false;
-        }
-
         // Initialize SDL_ttf
-        if (TTF_Init() == -1) {
+        if (!TTF_Init()) {
           printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n",
-                 TTF_GetError());
+                 SDL_GetError());
           success = false;
         }
       }
@@ -110,7 +95,6 @@ void close() {
   gRenderer = NULL;
 
   // Quit SDL subsystems
-  IMG_Quit();
   SDL_Quit();
 }
 
@@ -122,7 +106,7 @@ SDL_Texture *loadTexture(std::string path) {
   SDL_Surface *loadedSurface = IMG_Load(path.c_str());
   if (loadedSurface == NULL) {
     printf("Unable to load image %s! SDL_image Error: %s\n", path.c_str(),
-           IMG_GetError());
+           SDL_GetError());
   } else {
     // Create texture from surface pixels
     newTexture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
@@ -132,7 +116,7 @@ SDL_Texture *loadTexture(std::string path) {
     }
 
     // Get rid of old loaded surface
-    SDL_FreeSurface(loadedSurface);
+    SDL_DestroySurface(loadedSurface);
   }
 
   return newTexture;
@@ -145,13 +129,13 @@ Vec cameraOffset;
 
 void drawCircleLines(SDL_Renderer* renderer, float x, float y, float r) {
   const int segments = 32; // Enough to look round
-  SDL_Point points[segments + 1];
+  SDL_FPoint points[segments + 1];
   for (int i = 0; i <= segments; i++) {
       float angle = i * (2.0f * M_PI / segments);
       points[i].x = x + r * cos(angle);
       points[i].y = y + r * sin(angle);
   }
-  SDL_RenderDrawLines(renderer, points, segments + 1);
+  SDL_RenderLines(renderer, points, segments + 1);
 }
 
 int main(int, char *[]) {
@@ -228,20 +212,20 @@ int main(int, char *[]) {
       for (std::size_t i = 0; i < shapes.size(); i++) {
         if (auto circlePtr = dynamic_cast<Circle *>(shapes[i].get())) {
           for (double i = 0; i < 2 * M_PI; i += 0.1) {
-            SDL_RenderDrawPoint(
+            SDL_RenderPoint(
                 gRenderer,
-                circlePtr->center.x + (int)cameraOffset.x + circlePtr->radius * std::cos(i),
-                circlePtr->center.y + (int)cameraOffset.y + circlePtr->radius * std::sin(i));
+                circlePtr->center.x + cameraOffset.x + circlePtr->radius * std::cos(i),
+                circlePtr->center.y + cameraOffset.y + circlePtr->radius * std::sin(i));
           }
-          drawCircleLines(gRenderer, circlePtr->center.x + (int)cameraOffset.x,
-            circlePtr->center.y + (int)cameraOffset.y, circlePtr->radius);
+          drawCircleLines(gRenderer, circlePtr->center.x + cameraOffset.x,
+            circlePtr->center.y + cameraOffset.y, circlePtr->radius);
         } else if (auto rectPtr =
                         dynamic_cast<Rectangle *>(shapes[i].get())) {
-          SDL_Rect recColored = {
-              (int)rectPtr->tlPoint.x + (int)cameraOffset.x, (int)rectPtr->tlPoint.y + (int)cameraOffset.y,
-              (int)(rectPtr->brPoint.x - rectPtr->tlPoint.x),
-              (int)(rectPtr->brPoint.y - rectPtr->tlPoint.y)};
-          SDL_RenderDrawRect(gRenderer, &recColored);
+          SDL_FRect recColored = {
+              (float)(rectPtr->tlPoint.x + cameraOffset.x), (float)(rectPtr->tlPoint.y + cameraOffset.y),
+              (float)(rectPtr->brPoint.x - rectPtr->tlPoint.x),
+              (float)(rectPtr->brPoint.y - rectPtr->tlPoint.y)};
+          SDL_RenderRect(gRenderer, &recColored);
         }
       }
 
