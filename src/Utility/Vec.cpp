@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "Vec.hpp"
 
 // Constructor

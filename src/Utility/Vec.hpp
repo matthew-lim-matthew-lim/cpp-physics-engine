@@ -1,8 +1,6 @@
 #ifndef VEC_HPP
 #define VEC_HPP
 
-#include <iostream>
-
 class Vec {
 public:
   double x, y;

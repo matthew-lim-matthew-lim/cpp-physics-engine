@@ -1,8 +1,6 @@
 #include "Shapes/Circle.hpp"
 #include "Shapes/Rectangle.hpp"
 #include "Shapes/Shape.hpp"
-#include "Ui/Slider.hpp"
-#include "Utility/LTexture.hpp"
 #include "Utility/Vec.hpp"
 #include "Ui/UI.hpp"
 
@@ -17,7 +15,6 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <optional>
 
 // Screen dimension constants
 const int SCREEN_WIDTH = 1280;
