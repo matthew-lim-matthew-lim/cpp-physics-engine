@@ -187,17 +187,18 @@ int main(int, char *[]) {
       // Process collisions
       // Skip `shapes[0]` as that is the display shape (shape on user's cursor)
       for (std::size_t i = 1; i < shapes.size(); i++) {
+        if (shapes[i]->mass != INFINITE_MASS) {
+          shapes[i]->velocity.y += (9.8 / SPEED_SCALE) * deltaTime;
+        }
+      }
+
+      for (std::size_t i = 1; i < shapes.size(); i++) {
         for (std::size_t j = i + 1; j < shapes.size(); j++) {
-          if (shapes[i]->mass != INFINITE_MASS) {
-            shapes[i]->velocity.y += (9.8 / SPEED_SCALE) * deltaTime;
-          }
-
-          if (shapes[j]->mass != INFINITE_MASS) {
-            shapes[j]->velocity.y += (9.8 / SPEED_SCALE) * deltaTime;
-          }
-
           shapes[i]->collidesWith(*shapes[j]);
         }
+      }
+
+      for (std::size_t i = 1; i < shapes.size(); i++) {
         shapes[i]->move();
       }
 
